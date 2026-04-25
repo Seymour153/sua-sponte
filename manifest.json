@@ -1,0 +1,13 @@
+{
+  "name": "Sua Sponte — Operator Daily",
+  "short_name": "Sua Sponte",
+  "description": "Daily operating system for Ranger prep — hard-goal PT, CBT/DBT mind work, habit ledger, AAR. No algorithm. Just the log.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0d0b",
+  "theme_color": "#0b0d0b",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

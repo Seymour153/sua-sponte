@@ -1,0 +1,1965 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0d0b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
+<title>Sua Sponte</title>
+<style>
+  /* =========================================================
+     SUA SPONTE — daily tools for Ranger prep + mind work.
+     Tactical aesthetic (restrained), clinical substance (CBT/DBT).
+     ========================================================= */
+  :root{
+    --bg:      #0b0d0b;
+    --bg-2:   #12150f;
+    --panel:  #161a13;
+    --panel-2:#1d221a;
+    --line:   #2a2f27;
+    --line-2: #383f33;
+    --ink:    #e8e6df;
+    --ink-dim:#9ea398;
+    --ink-low:#666b60;
+    --od:     #6b7d3a;
+    --od-2:   #4a5d23;
+    --tan:    #c4a86b;
+    --ok:     #78a37e;
+    --warn:   #c7a86b;
+    --err:    #a23b2d;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;min-height:100vh;font-size:15px;line-height:1.5}
+  body{
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0));
+    padding-top: env(safe-area-inset-top, 0);
+    background-image:
+      radial-gradient(ellipse at top, rgba(107,125,58,.04), transparent 60%),
+      radial-gradient(ellipse at bottom right, rgba(196,168,107,.03), transparent 60%);
+  }
+  button{font-family:inherit;color:inherit;background:none;border:0;cursor:pointer}
+  input,textarea,select{font-family:inherit;color:var(--ink);background:var(--bg-2);border:1px solid var(--line);padding:10px 12px;border-radius:4px;width:100%;font-size:15px;line-height:1.4}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--od)}
+  textarea{min-height:72px;resize:vertical}
+  h1,h2,h3{margin:0 0 .4em;font-weight:600;line-height:1.3}
+  h1{font-size:20px;letter-spacing:.02em}
+  h2{font-size:15px;letter-spacing:.1em;text-transform:uppercase;color:var(--tan)}
+  h3{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-dim);font-weight:600}
+  .dim{color:var(--ink-dim)}
+  .sub{font-size:13px;color:var(--ink-dim);line-height:1.55}
+  .mono{font-family:var(--mono)}
+
+  /* ---------- HEADER ---------- */
+  header.topbar{
+    position:sticky;top:0;z-index:20;
+    background:rgba(11,13,11,.93);
+    border-bottom:1px solid var(--line);
+    padding:14px 16px 12px;
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    backdrop-filter:blur(10px);
+  }
+  .brand{display:flex;flex-direction:column;line-height:1.1}
+  .brand .name{font-weight:800;font-size:17px;letter-spacing:.18em;color:var(--ink)}
+  .brand .motto{font-family:var(--mono);font-size:9px;letter-spacing:.3em;color:var(--od);margin-top:3px}
+  .daychip{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--tan);border:1px solid var(--line);padding:6px 10px;border-radius:3px;text-align:right;line-height:1.25}
+  .daychip b{color:var(--ink);font-weight:700;font-size:13px;letter-spacing:.08em}
+  .daychip .d{color:var(--ink-low);font-size:10px;margin-top:1px}
+
+  main{max-width:720px;margin:0 auto;padding:14px 14px 28px}
+
+  /* ---------- CARDS ---------- */
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:16px;margin-bottom:12px;position:relative;overflow:hidden}
+  .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--od-2)}
+  .card.tan::before{background:var(--tan)}
+  .card.alert::before{background:var(--err)}
+  .card.plain::before{display:none}
+  .card > h2:first-child{margin-top:0}
+
+  .row{display:flex;gap:10px;align-items:center}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  @media (max-width:440px){.grid3{grid-template-columns:1fr 1fr}}
+  .spacer{height:10px}
+  .divider{height:1px;background:var(--line);margin:14px 0}
+
+  label.lbl{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:5px;margin-top:6px}
+  .field{margin-bottom:10px}
+
+  /* ---------- BUTTONS ---------- */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:4px;background:var(--panel-2);border:1px solid var(--line-2);font-size:13px;letter-spacing:.08em;font-weight:600;transition:all .12s;color:var(--ink)}
+  .btn:hover{border-color:var(--od);color:#fff}
+  .btn.primary{background:var(--od-2);border-color:var(--od);color:#fff}
+  .btn.primary:hover{background:var(--od)}
+  .btn.sm{padding:6px 10px;font-size:11px}
+  .btn.full{width:100%}
+  .btn.ghost{background:transparent}
+  .btn.danger{color:var(--err);border-color:var(--err)}
+  .btn.upper{text-transform:uppercase;letter-spacing:.14em}
+
+  /* ---------- TABS ---------- */
+  nav.tabs{
+    position:fixed;left:0;right:0;bottom:0;z-index:30;
+    background:rgba(11,13,11,.96);
+    border-top:1px solid var(--line);
+    backdrop-filter:blur(12px);
+    padding:6px 4px calc(6px + env(safe-area-inset-bottom,0));
+    display:grid;grid-template-columns:repeat(6,1fr);gap:2px;
+  }
+  nav.tabs button{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+    padding:8px 2px;border-radius:4px;color:var(--ink-low);
+    font-family:var(--mono);font-size:9px;letter-spacing:.18em;font-weight:700;
+  }
+  nav.tabs button svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  nav.tabs button.active{color:var(--tan);background:rgba(196,168,107,.06)}
+  nav.tabs button.active svg{stroke:var(--tan)}
+
+  .view{display:none}
+  .view.active{display:block;animation:fadeIn .16s ease-out}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+  /* ---------- BANNER (view header) ---------- */
+  .banner{
+    position:relative;
+    background:
+      linear-gradient(135deg, rgba(107,125,58,.10), rgba(196,168,107,.04) 55%, transparent),
+      var(--panel);
+    border:1px solid var(--line);border-radius:6px;padding:14px 16px;margin-bottom:12px;
+  }
+  .banner h2{color:var(--tan);margin-bottom:4px}
+  .banner p{margin:0;font-size:13px;color:var(--ink-dim);line-height:1.55}
+
+  /* ---------- STATS + STANDARDS ---------- */
+  .stat{background:var(--bg-2);border:1px solid var(--line);padding:10px 12px;border-radius:4px}
+  .stat .k{font-family:var(--mono);font-size:9px;letter-spacing:.2em;color:var(--ink-low);text-transform:uppercase}
+  .stat .v{font-family:var(--mono);font-size:20px;font-weight:700;margin-top:2px;line-height:1.1}
+  .stat .v.small{font-size:15px}
+  .stat .s{font-family:var(--mono);font-size:10px;color:var(--ink-dim);margin-top:3px;letter-spacing:.04em}
+
+  .std{background:var(--bg-2);border:1px solid var(--line);padding:12px;border-radius:4px;margin-bottom:8px}
+  .std .lbl-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+  .std .name{color:var(--ink)}
+  .std .tgt{color:var(--ink-low);font-size:10px}
+  .bar{height:6px;background:#0b0d0b;border:1px solid var(--line);border-radius:2px;overflow:hidden}
+  .bar > i{display:block;height:100%;background:linear-gradient(90deg, var(--od-2), var(--od));transition:width .35s}
+  .bar.done > i{background:linear-gradient(90deg, var(--ok), #a9c86b)}
+  .std .cur{font-family:var(--mono);font-size:11px;color:var(--tan);margin-top:6px;letter-spacing:.06em}
+  .std input{margin-top:8px}
+
+  /* ---------- SCORE RING ---------- */
+  .ranger-score{display:flex;align-items:center;gap:14px;padding:2px 0}
+  .score-ring{width:86px;height:86px;position:relative;flex-shrink:0}
+  .score-ring svg{transform:rotate(-90deg);width:100%;height:100%}
+  .score-ring .rt{stroke:var(--line)}
+  .score-ring .rv{stroke:var(--od);transition:stroke-dashoffset .6s}
+  .score-ring .pct{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono)}
+  .score-ring .pct .n{font-size:22px;font-weight:800;color:var(--ink);line-height:1}
+  .score-ring .pct .lbl{font-size:8px;letter-spacing:.2em;color:var(--ink-low);margin-top:2px}
+  .score-copy{flex:1;font-family:var(--mono);font-size:11px;color:var(--ink-dim);line-height:1.55;letter-spacing:.04em}
+  .score-copy b{color:var(--tan);font-weight:700}
+  .score-copy .call{color:var(--ink);display:block;margin-top:4px}
+
+  /* ---------- CHECKLIST ---------- */
+  .checklist{display:flex;flex-direction:column;gap:6px}
+  .check-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg-2);border:1px solid var(--line);border-radius:4px;cursor:pointer;transition:all .12s}
+  .check-row:hover{border-color:var(--line-2)}
+  .check-row.done{background:rgba(107,125,58,.10);border-color:var(--od)}
+  .check-row.done .ck{background:var(--od);border-color:var(--od)}
+  .check-row.done .ck::after{content:"";display:block;width:5px;height:9px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg) translate(-1px,-1px)}
+  .ck{width:18px;height:18px;border:1.5px solid var(--ink-low);border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+  .check-row .txt{flex:1;font-size:14px}
+  .check-row .streak{font-family:var(--mono);font-size:10px;color:var(--tan);letter-spacing:.08em}
+  .check-row.kill.done{background:rgba(162,59,45,.09);border-color:var(--err)}
+  .check-row.kill.done .ck{background:var(--err);border-color:var(--err)}
+
+  .inline-add{display:flex;gap:6px;margin-top:8px}
+  .inline-add input{flex:1}
+
+  /* ---------- STANZA ---------- */
+  .stanza{background:var(--bg-2);border:1px solid var(--line);border-left:3px solid var(--tan);padding:12px 14px;border-radius:4px}
+  .stanza .letter{display:inline-block;font-family:var(--mono);font-weight:900;color:var(--tan);font-size:22px;margin-right:6px;line-height:1}
+  .stanza p{margin:6px 0 0;line-height:1.55;font-size:14px;color:var(--ink)}
+
+  /* ---------- BREATHING RING ---------- */
+  .breath-wrap{display:flex;flex-direction:column;align-items:center;padding:14px 8px 8px}
+  .ring{position:relative;width:240px;height:240px;display:flex;align-items:center;justify-content:center;margin-bottom:6px}
+  .ring .frame{position:absolute;inset:0;border:1px dashed var(--line-2);border-radius:50%;opacity:.55}
+  .ring .pulse{position:absolute;width:80%;height:80%;
+    background:radial-gradient(circle, rgba(107,125,58,.55) 0%, rgba(196,168,107,.18) 65%, transparent 100%);
+    border:1px solid rgba(196,168,107,.35);border-radius:50%;
+    transform:scale(0.3);transform-origin:center;
+    transition:transform 1s ease-in-out;will-change:transform}
+  .ring .label{position:relative;z-index:2;text-align:center;padding:0 10px}
+  .ring .phase{font-family:var(--mono);font-size:11px;color:var(--ink-dim);letter-spacing:.3em;text-transform:uppercase}
+  .ring .count{font-size:48px;font-weight:800;color:var(--tan);font-variant-numeric:tabular-nums;line-height:1.05;margin-top:4px;text-shadow:0 0 10px rgba(0,0,0,.7)}
+  .breath-meta{margin-top:14px;font-family:var(--mono);font-size:11px;color:var(--ink-dim);text-align:center;letter-spacing:.12em;display:flex;gap:14px;justify-content:center;align-items:baseline}
+  .breath-meta b{color:var(--ink);font-weight:600}
+
+  /* ---------- CHIPS ---------- */
+  .chip{display:inline-block;padding:4px 9px;border:1px solid var(--line-2);border-radius:3px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--ink-dim);margin-right:4px;margin-bottom:4px;background:var(--bg-2);cursor:pointer;user-select:none;text-transform:uppercase}
+  .chip.selected{border-color:var(--tan);color:var(--tan);background:rgba(196,168,107,.1)}
+
+  /* ---------- ENTRIES ---------- */
+  .entry{background:var(--bg-2);border:1px solid var(--line);border-radius:4px;padding:12px 14px;margin-bottom:8px}
+  .entry .date{font-family:var(--mono);font-size:10px;color:var(--tan);letter-spacing:.15em;text-transform:uppercase;margin-bottom:4px}
+  .entry .line{font-size:13px;color:var(--ink-dim);margin-top:3px;line-height:1.5}
+  .entry .line b{color:var(--ink);font-weight:600}
+
+  /* ---------- INTENSITY SLIDER ---------- */
+  .intensity{display:flex;gap:8px;align-items:center;margin-top:6px}
+  .intensity .lab{font-family:var(--mono);font-size:10px;color:var(--ink-low);letter-spacing:.12em;min-width:70px;text-transform:uppercase}
+  .intensity input[type="range"]{flex:1;accent-color:var(--od)}
+  .intensity .val{font-family:var(--mono);min-width:44px;text-align:right;color:var(--tan);font-size:13px}
+
+  /* ---------- DETAILS / EXPANDABLE ---------- */
+  details{background:var(--bg-2);border:1px solid var(--line);border-radius:4px;margin-bottom:6px}
+  details summary{padding:11px 14px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;font-size:14px}
+  details summary::-webkit-details-marker{display:none}
+  details summary::after{content:"+";color:var(--ink-low);font-size:18px;line-height:1;font-family:var(--mono)}
+  details[open] summary::after{content:"−"}
+  details summary b{color:var(--tan);font-family:var(--mono);letter-spacing:.1em;margin-right:8px;font-size:13px}
+  details .body{padding:0 14px 14px;font-size:13px;line-height:1.6;color:var(--ink-dim)}
+  details .body b{color:var(--ink);font-weight:600}
+
+  /* ---------- REF BLOCKS ---------- */
+  .ref-block{background:var(--bg-2);border:1px solid var(--line);border-left:3px solid var(--od);border-radius:0 4px 4px 0;padding:13px 15px;margin-bottom:8px}
+  .ref-block h3{color:var(--tan);margin-bottom:6px}
+  .ref-block p,.ref-block li{font-size:13px;line-height:1.6;color:var(--ink-dim)}
+  .ref-block p{margin:0 0 6px}
+  .ref-block b{color:var(--ink);font-weight:600}
+  .ref-block ul,.ref-block ol{margin:0;padding-left:18px}
+
+  /* ---------- INFO CALLOUT ---------- */
+  .info{background:rgba(107,125,58,.06);border-left:3px solid var(--od);padding:10px 13px;border-radius:0 4px 4px 0;font-size:13px;color:var(--ink-dim);margin:8px 0;line-height:1.6}
+  .info b{color:var(--ink);font-weight:600}
+
+  /* ---------- TOAST ---------- */
+  #toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);z-index:100;background:var(--od-2);color:#fff;padding:10px 16px;border-radius:4px;font-family:var(--mono);font-size:11px;letter-spacing:.15em;text-transform:uppercase;border:1px solid var(--od);box-shadow:0 6px 24px rgba(0,0,0,.5);opacity:0;transition:opacity .18s;pointer-events:none;max-width:90vw;text-align:center}
+  #toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="name">SUA SPONTE</span>
+    <span class="motto">OF THEIR OWN ACCORD</span>
+  </div>
+  <div class="daychip">
+    <div>DAY <b id="dayNum">001</b></div>
+    <div class="d" id="dateStr">—</div>
+    <div class="d" id="headerPhase" style="font-family:var(--mono);font-size:10px;letter-spacing:.15em;color:var(--tan)">BASE</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ========== BRIEF ========== -->
+  <section class="view" id="view-brief">
+    <div class="banner">
+      <h2 id="briefGreet">Morning.</h2>
+      <p id="briefSub">Lock in the mission before the world gets loud.</p>
+    </div>
+
+    <div class="card">
+      <h2>The Engine</h2>
+      <div class="ranger-score">
+        <div class="score-ring">
+          <svg viewBox="0 0 100 100">
+            <circle class="rt" cx="50" cy="50" r="44" fill="none" stroke-width="6"></circle>
+            <circle class="rv" cx="50" cy="50" r="44" fill="none" stroke-width="6" stroke-linecap="round"
+                    stroke-dasharray="276.46" stroke-dashoffset="276.46" id="scoreArc"></circle>
+          </svg>
+          <div class="pct"><span class="n" id="scoreNum">0</span><span class="lbl">% of target</span></div>
+        </div>
+        <div class="score-copy">
+          Composite against hard goals, not floors. The score is the single number that tells you where the engine is.
+          <span class="call" id="scoreCall">Open PT and log your current bests.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="border-left:3px solid var(--tan)">
+      <h2>Today's Session</h2>
+      <div id="todaySessionBrief"></div>
+    </div>
+
+    <div class="card">
+      <h2>What your data says</h2>
+      <p class="sub" style="margin-top:-4px;margin-bottom:8px">Reads of your last 7\u201360 days. The app is finally listening; this is what it heard.</p>
+      <div id="coachReadBox"></div>
+    </div>
+
+    <div class="card">
+      <h2>Recovery · last night, today’s body</h2>
+      <p class="sub" style="margin-top:-4px;margin-bottom:10px">Sleep is the engine’s repair shop. RPE is your honest read on yesterday’s load. (Walker 2017; Borg 1982)</p>
+      <div class="grid2" style="gap:12px;margin-bottom:8px">
+        <div class="field" style="margin:0"><label class="lbl">Hours slept</label>
+          <input id="recHours" type="number" step="0.5" min="0" max="14" placeholder="e.g. 7.5" inputmode="decimal"></div>
+        <div class="field" style="margin:0"><label class="lbl">Sleep quality</label>
+          <div id="recQualityChips" style="display:flex;gap:4px">
+            <span class="chip" data-val="1" onclick="selectRecChip('recQualityChips',1)">1</span>
+            <span class="chip" data-val="2" onclick="selectRecChip('recQualityChips',2)">2</span>
+            <span class="chip" data-val="3" onclick="selectRecChip('recQualityChips',3)">3</span>
+            <span class="chip" data-val="4" onclick="selectRecChip('recQualityChips',4)">4</span>
+            <span class="chip" data-val="5" onclick="selectRecChip('recQualityChips',5)">5</span>
+          </div>
+        </div>
+      </div>
+      <div class="field"><label class="lbl">Yesterday’s training RPE (0=rest, 1=easy, 10=max)</label>
+        <div id="recRpeChips" style="display:flex;gap:4px;flex-wrap:wrap"><span class="chip" data-val="0" onclick="selectRecChip('recRpeChips',0)">0</span><span class="chip" data-val="1" onclick="selectRecChip('recRpeChips',1)">1</span><span class="chip" data-val="2" onclick="selectRecChip('recRpeChips',2)">2</span><span class="chip" data-val="3" onclick="selectRecChip('recRpeChips',3)">3</span><span class="chip" data-val="4" onclick="selectRecChip('recRpeChips',4)">4</span><span class="chip" data-val="5" onclick="selectRecChip('recRpeChips',5)">5</span><span class="chip" data-val="6" onclick="selectRecChip('recRpeChips',6)">6</span><span class="chip" data-val="7" onclick="selectRecChip('recRpeChips',7)">7</span><span class="chip" data-val="8" onclick="selectRecChip('recRpeChips',8)">8</span><span class="chip" data-val="9" onclick="selectRecChip('recRpeChips',9)">9</span><span class="chip" data-val="10" onclick="selectRecChip('recRpeChips',10)">10</span></div>
+      </div>
+      <div class="field"><label class="lbl">Soreness</label>
+        <div id="recSorenessChips" style="display:flex;gap:4px;flex-wrap:wrap">
+          <span class="chip" data-val="none"     onclick="selectRecChip('recSorenessChips','none')">none</span>
+          <span class="chip" data-val="mild"     onclick="selectRecChip('recSorenessChips','mild')">mild</span>
+          <span class="chip" data-val="moderate" onclick="selectRecChip('recSorenessChips','moderate')">moderate</span>
+          <span class="chip" data-val="heavy"    onclick="selectRecChip('recSorenessChips','heavy')">heavy</span>
+        </div>
+      </div>
+      <button class="btn primary full upper" onclick="saveRecovery()">Log recovery</button>
+      <div id="recoveryWeek" style="margin-top:14px"></div>
+    </div>
+
+    <div class="card tan">
+      <h2>Today's Mission</h2>
+      <div class="field"><label class="lbl">Primary — one thing</label>
+        <input id="missionPrimary" placeholder="The one thing that matters most today"></div>
+      <div class="field"><label class="lbl">Supporting</label>
+        <input id="missionS1" placeholder="1 —" style="margin-bottom:6px">
+        <input id="missionS2" placeholder="2 —" style="margin-bottom:6px">
+        <input id="missionS3" placeholder="3 —"></div>
+      <div class="field"><label class="lbl">Why it matters</label>
+        <textarea id="missionWhy" placeholder="One line connecting today to the longer arc."></textarea></div>
+      <button class="btn primary full upper" onclick="saveMission()">Lock in brief</button>
+    </div>
+
+    <div class="card">
+      <h2>Stanza of the Day</h2>
+      <div id="stanzaOfDay"></div>
+      <div style="text-align:center;margin-top:10px"><button class="btn sm ghost" onclick="go('creed')">Read full creed</button></div>
+    </div>
+
+    <div class="card">
+      <h2>Body Basics — PLEASE</h2>
+      <p class="sub" style="margin-top:-4px;margin-bottom:10px">DBT PLEASE skill — the daily fundamentals beyond sleep (which lives on the Recovery card above). The mind only stands on the body that holds it up. (Linehan 2014)</p>
+      <div class="checklist" id="pleaseList"></div>
+    </div>
+
+    <div class="card">
+      <h2>Today's Habits — quick toggle</h2>
+      <p class="sub" style="margin-top:-4px;margin-bottom:10px">One-tap check-ins for today. Add/remove habits and see streaks on the LEDGER tab.</p>
+      <div class="checklist" id="todayHabits"></div>
+    </div>
+    <div class="card">
+      <h2>Long arc · phase &amp; data</h2>
+      <p class="sub" style="margin-top:-4px;margin-bottom:10px">The work is the work. But the work in base building is not the work in peak. Pick the phase that matches where you actually are. (Bompa &amp; Haff, 2018)</p>
+      <div id="phaseStatus" style="margin-bottom:10px"></div>
+      <div id="phaseChips" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px"></div>
+      <div class="divider"></div>
+      <h3 style="font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--tan);margin-bottom:8px">Weekly training template</h3>
+      <div id="weeklyEditor"></div>
+      <div class="divider"></div>
+      <h3 style="font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--tan);margin-bottom:8px">Backup · portability</h3>
+      <p class="sub" style="margin-top:0;margin-bottom:10px;font-size:12px">Local-storage data lives only on this device. Export periodically. Import to restore on a new device.</p>
+      <div class="grid2" style="gap:8px">
+        <button class="btn full upper" onclick="exportData()">Export JSON</button>
+        <label class="btn full upper" style="cursor:pointer;text-align:center;display:inline-block">Import JSON
+          <input type="file" accept="application/json" style="display:none" onchange="importData(this.files[0])">
+        </label>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ========== PT ========== -->
+  <section class="view" id="view-pt">
+    <div class="banner">
+      <h2>The Engine</h2>
+      <p>Targets are hard goals, not entry floors. Minimums get men into Ranger School. Targets build the man who finishes it.</p>
+    </div>
+
+    <div class="card" style="border-left:3px solid var(--tan)">
+      <div id="ptTodaySession"></div>
+    </div>
+
+    <div class="card">
+      <h2>Log Today</h2>
+      <div id="stdList"></div>
+      <button class="btn primary full upper" onclick="savePT()" style="margin-top:6px">Commit log</button>
+    </div>
+
+    <div class="card">
+      <h2>Readiness Map</h2>
+      <p class="sub" style="margin-top:-4px;margin-bottom:10px">Two thresholds. The map ticks itself as your data crosses them. No self-reporting required.</p>
+      <div id="readinessMap"></div>
+    </div>
+
+    <div class="card">
+      <h2>Trends · the lifetime arc</h2>
+      <p class="sub" style="margin-top:-4px;margin-bottom:10px">30-day window · 90-day window · all-time. Lifetime data; the longer the arc, the truer the read.</p>
+      <div id="trendsBox"></div>
+    </div>
+
+    <div class="card collapsible collapsed">
+      <h2 onclick="toggleCard(this.parentElement)">Why targets, not floors</h2>
+      <div class="collapsible-body">
+        <p class="sub" style="margin-top:6px;line-height:1.7">
+          Floors tell you who gets in the door. Targets tell you who stays on his feet at hour 60.
+          You already know this from varsity track — the kid running 4:20 miles didn't show up doing it; he trained where 4:40 felt honest-hard until it didn't.
+          Same engine. Different event. Train toward the target; the floor comes free.
+        </p>
+        <p class="sub" style="margin-top:10px;line-height:1.7;font-size:13px;border-left:2px solid var(--line);padding-left:10px">
+          <b style="color:var(--tan);letter-spacing:.1em;font-size:11px">STEADY STATE AT FORT MOORE</b><br>
+          ~3.5 hr sleep · 65–90 lb load · 2,200 cal in vs. 6,000+ cal burn. The map (above) shows what you've crossed; this is what those numbers have to survive.
+        </p>
+      </div>
+    </div>
+    <div id="creedAnchor_pt"></div>
+  </section>
+
+  <!-- ========== LEDGER ========== -->
+  <section class="view" id="view-ledger">
+    <div class="banner">
+      <h2>The Ledger</h2>
+      <p>Build the man. Break the drag. Tap when you did it (build) or held the line (break). Streaks tell the truth.</p>
+    </div>
+
+    <div class="card">
+      <h2>Build</h2>
+      <div class="checklist" id="buildList"></div>
+      <div class="inline-add">
+        <input id="newBuild" placeholder="Add a habit to build…" onkeydown="if(event.key==='Enter')addHabit('build')">
+        <button class="btn sm" onclick="addHabit('build')">Add</button>
+      </div>
+    </div>
+
+    <div class="card alert">
+      <h2 style="color:var(--err)">Break</h2>
+      <p class="sub" style="margin-top:-4px;margin-bottom:10px">Tap when you did NOT do the bad habit today. Streak = days clean.</p>
+      <div class="checklist" id="killList"></div>
+      <div class="inline-add">
+        <input id="newKill" placeholder="Add a habit to break…" onkeydown="if(event.key==='Enter')addHabit('kill')">
+        <button class="btn sm" onclick="addHabit('kill')">Add</button>
+      </div>
+    </div>
+
+    <div class="info">
+      The useful unit isn't willpower — it's the <b>cue → routine → reward</b> loop (Duhigg, Clear). <b>Building</b>: stack a new habit onto an existing anchor ("after I pour coffee, I…"). <b>Breaking</b>: identify the trigger (time, place, emotion, preceding action) and pre-commit an alternative.
+    </div>
+    <div id="creedAnchor_ledger"></div>
+  </section>
+
+  <!-- ========== MIND ========== -->
+  <section class="view" id="view-mind">
+    <div class="banner">
+      <h2>Mind</h2>
+      <p>Evidence-based tools. CBT (Beck, Burns) for restructuring thoughts. DBT (Linehan) for regulating emotion and navigating hard conversations.</p>
+    </div>
+
+    <!-- EMERGENCY — one-tap path when spiking -->
+    <div class="card" style="border-color:var(--tan);background:linear-gradient(180deg,rgba(196,168,107,.06),transparent)">
+      <h2 style="color:var(--tan);margin-bottom:4px">Spiking right now?</h2>
+      <p class="sub" style="margin-top:0;margin-bottom:10px">Panic, rage, flood, can't-think. Skip the thinking tools. Body first.</p>
+      <button class="btn primary full upper" onclick="emergencyMode()" style="font-size:14px;padding:14px">I'm spiking — start now</button>
+      <p class="sub" style="margin-top:8px;font-size:11px;line-height:1.5">Cold water on the face, then breathe. The app will walk you through it.</p>
+    </div>
+
+    <!-- CBT THOUGHT RECORD -->
+    <div class="card">
+      <h2>Thought Record · CBT</h2>
+      <p class="sub" style="margin-top:-4px;margin-bottom:12px">When a thought is spiking an emotion, slow it down. Examine it like evidence.</p>
+
+      <div class="field"><label class="lbl">Situation — just the facts</label>
+        <textarea id="trSit" placeholder="e.g. Dad interrupted me during dinner."></textarea></div>
+
+      <div class="field"><label class="lbl">Emotion(s) — tap or type</label>
+        <div id="trEmotionChips" style="margin-bottom:6px"></div>
+        <input id="trEmotion" placeholder="e.g. frustrated, dismissed, small">
+        <label class="lbl" style="margin-top:8px;display:block">Intensity (tap one)</label>
+        <div id="trIntAChips" style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">
+          <span class="chip" data-val="0"   onclick="selectRecChip('trIntAChips',0)">0</span>
+          <span class="chip" data-val="25"  onclick="selectRecChip('trIntAChips',25)">25</span>
+          <span class="chip selected" data-val="50"  onclick="selectRecChip('trIntAChips',50)">50</span>
+          <span class="chip" data-val="75"  onclick="selectRecChip('trIntAChips',75)">75</span>
+          <span class="chip" data-val="100" onclick="selectRecChip('trIntAChips',100)">100</span>
+        </div>
+      </div>
+
+      <div class="field"><label class="lbl">Automatic thought — unfiltered</label>
+        <textarea id="trThought" placeholder="e.g. He never listens. He doesn't care what I say."></textarea></div>
+
+      <div class="field"><label class="lbl">Distortion(s) — tap what fits</label>
+        <div id="trDistortions"></div></div>
+
+      <div class="grid2">
+        <div class="field"><label class="lbl">Evidence FOR</label>
+          <textarea id="trFor" placeholder="What actually supports this thought?"></textarea></div>
+        <div class="field"><label class="lbl">Evidence AGAINST</label>
+          <textarea id="trAgainst" placeholder="Counter-examples?"></textarea></div>
+      </div>
+
+      <div class="field"><label class="lbl">Balanced alternative</label>
+        <textarea id="trBalanced" placeholder="Fair thought accounting for all the evidence."></textarea></div>
+
+      <div class="field"><label class="lbl">Emotion intensity now (tap one)</label>
+        <div id="trIntBChips" style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">
+          <span class="chip" data-val="0"   onclick="selectRecChip('trIntBChips',0)">0</span>
+          <span class="chip" data-val="25"  onclick="selectRecChip('trIntBChips',25)">25</span>
+          <span class="chip selected" data-val="50"  onclick="selectRecChip('trIntBChips',50)">50</span>
+          <span class="chip" data-val="75"  onclick="selectRecChip('trIntBChips',75)">75</span>
+          <span class="chip" data-val="100" onclick="selectRecChip('trIntBChips',100)">100</span>
+        </div>
+      </div>
+
+      <button class="btn primary full upper" onclick="saveTR()">Save record</button>
+      <div class="divider"></div>
+      <h3>Past records</h3>
+      <div id="trHistory"></div>
+    </div>
+
+    <!-- CHECK FACTS / OPPOSITE ACTION -->
+    <div class="card tan">
+      <h2>Check the Facts → Opposite Action · DBT</h2>
+      <p class="sub" style="margin-top:-4px;margin-bottom:12px">When an emotion feels huge, test whether it actually fits the situation. If not, act opposite — all the way, not halfway.</p>
+
+      <div class="field"><label class="lbl">Emotion — tap or name it</label>
+        <div id="cfEmotionChips" style="margin-bottom:6px"></div>
+        <input id="cfEmotion" placeholder="e.g. anger, shame, fear"></div>
+      <div class="field"><label class="lbl">Prompting event</label>
+        <textarea id="cfEvent"></textarea></div>
+      <div class="field"><label class="lbl">My interpretation — the story I'm telling</label>
+        <textarea id="cfInterp"></textarea></div>
+      <div class="field"><label class="lbl">Actual threat — stripped of story</label>
+        <textarea id="cfThreat" placeholder="What would a fair observer say is actually at stake?"></textarea></div>
+
+      <div class="grid2">
+        <button class="btn" onclick="cfVerdict('fits')">Emotion fits facts</button>
+        <button class="btn" onclick="cfVerdict('doesnt')">Doesn't fit</button>
+      </div>
+      <div class="sub" id="cfVerdictHint" style="margin-top:8px"></div>
+
+      <div id="cfOppWrap" style="display:none;margin-top:6px">
+        <div class="field"><label class="lbl">Urge — what I feel like doing</label>
+          <input id="cfUrge" placeholder="e.g. walk out, yell, shut down"></div>
+        <div class="field"><label class="lbl">Opposite action — and commit fully</label>
+          <input id="cfOpposite" placeholder="e.g. stay and speak calmly, approach, engage"></div>
+      </div>
+
+      <button class="btn primary full upper" onclick="saveCF()" style="margin-top:10px">Save</button>
+    </div>
+
+    <!-- TIPP -->
+    <div class="card">
+      <h2>TIPP · Emergency Toolkit · DBT</h2>
+      <p class="sub" style="margin-top:-4px;margin-bottom:12px">Acute spikes only — panic, rage, flood. Physiological, not cognitive. They work on the body first.</p>
+      <details>
+        <summary><b>T</b> Temperature</summary>
+        <div class="body">Cold water on the face or a cold shower (30–60 sec). Triggers the mammalian dive reflex — heart rate drops, parasympathetic system engages. Fastest tool. Skip if you have heart conditions.</div>
+      </details>
+      <details>
+        <summary><b>I</b> Intense exercise</summary>
+        <div class="body">Burn adrenaline. 10–20 min of genuinely hard output — burpees, sprints, jump rope. Intensity, not duration.</div>
+      </details>
+      <details>
+        <summary><b>P</b> Paced breathing</summary>
+        <div class="body">Exhale longer than inhale (4 in / 6–8 out). Activates parasympathetic dominance. Different from box breathing — box is neutral focus; paced exhale is calming.</div>
+      </details>
+      <details>
+        <summary><b>P</b> Paired muscle relaxation</summary>
+        <div class="body">Tense a muscle group 5–7 sec, release on exhale, notice the contrast. Work through groups: hands → arms → shoulders → face → chest → abs → legs. 3–5 min.</div>
+      </details>
+    </div>
+
+    <!-- BREATHING -->
+    <div class="card">
+      <h2>Breathing</h2>
+      <p class="sub" style="margin-top:-4px;margin-bottom:10px">Two protocols. Pick based on what you need.</p>
+
+      <div class="grid2" style="margin-bottom:10px">
+        <button class="btn" onclick="setBreath('box')" id="modeBox">Box · 4·4·4·4</button>
+        <button class="btn" onclick="setBreath('sigh')" id="modeSigh">Cyclic sigh · 3·1·6</button>
+      </div>
+      <div class="sub" id="breathDesc" style="margin-bottom:10px"></div>
+
+      <div class="breath-wrap">
+        <div class="ring" id="ring">
+          <div class="frame"></div>
+          <div class="pulse" id="pulse"></div>
+          <div class="label">
+            <div class="phase" id="breathPhase">Ready</div>
+            <div class="count" id="breathCount">—</div>
+          </div>
+        </div>
+        <div class="breath-meta">
+          <span>CYCLE <b id="breathCycle">0</b></span>
+          <span style="color:var(--line)">|</span>
+          <span>REMAINING <b id="breathTotal">5:00</b></span>
+        </div>
+      </div>
+      <div class="grid2" style="margin-top:10px">
+        <button class="btn primary" onclick="startBreath()" id="breathStart">Start · 5 min</button>
+        <button class="btn" onclick="stopBreath()">Stop</button>
+      </div>
+      <div class="info">
+        <b>Cyclic sighing</b> — short inhale through nose, small top-up inhale, long exhale through mouth. 2023 Stanford/Huberman study (Cell Reports Medicine) found 5 min/day beat mindfulness meditation and box breathing for daily mood improvement over a month. <b>Box breathing</b> is better for pre-task focus; <b>cyclic sighing</b> is better for daily calm.
+      </div>
+    </div>
+
+    <!-- DEAR MAN -->
+    <div class="card">
+      <h2>DEAR MAN · Hard Conversation Planner · DBT</h2>
+      <p class="sub" style="margin-top:-4px;margin-bottom:12px">Use when you need to ask for something, set a limit, or have a real conversation. The I-statement work with your dad lives here — this is the structured version of what you're already doing.</p>
+
+      <div class="field"><label class="lbl">Who · what about — tap or type</label>
+        <div id="dmWhoChips" style="margin-bottom:6px"></div>
+        <input id="dmWho" placeholder="e.g. Dad, about him talking over me"></div>
+      <div class="field"><label class="lbl"><b>D</b> Describe — just facts, no interpretation</label>
+        <textarea id="dmD" placeholder="e.g. Last three dinners I started talking about work and the subject changed before I finished."></textarea></div>
+      <div class="field"><label class="lbl"><b>E</b> Express — your feeling, using "I"</label>
+        <textarea id="dmE" placeholder="e.g. I feel dismissed and like I don't want to share much with you."></textarea></div>
+      <div class="field"><label class="lbl"><b>A</b> Assert — the specific ask</label>
+        <textarea id="dmA" placeholder="e.g. I'd like you to let me finish before responding, even if you disagree."></textarea></div>
+      <div class="field"><label class="lbl"><b>R</b> Reinforce — what's in it for them</label>
+        <textarea id="dmR" placeholder="e.g. We'll argue less, and I'll actually open up more with you."></textarea></div>
+      <div class="grid3" style="gap:8px;margin-top:8px">
+        <div class="info" style="margin:0;font-size:12px"><b>M</b>indful — stay on topic. Broken-record if needed.</div>
+        <div class="info" style="margin:0;font-size:12px"><b>A</b>ppear confident — voice, posture, eye contact.</div>
+        <div class="info" style="margin:0;font-size:12px"><b>N</b>egotiate — willing to give to get.</div>
+      </div>
+      <button class="btn primary full upper" onclick="saveDM()" style="margin-top:10px">Save plan</button>
+      <div class="divider"></div>
+      <h3>Past plans</h3>
+      <div id="dmHistory"></div>
+    </div>
+    <div id="creedAnchor_mind"></div>
+  </section>
+
+  <!-- ========== AAR ========== -->
+  <section class="view" id="view-aar">
+    <div class="banner">
+      <h2>After-Action Review</h2>
+      <p>Four questions. No flinching. The gap between plan and actual is where you actually learn.</p>
+    </div>
+
+    <div class="card">
+      <p class="sub" style="margin-top:0;margin-bottom:10px">Tired? Tap a template to pre-fill, then edit. Or carry yesterday's plan forward.</p>
+      <div id="aarQuickRow" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px"></div>
+      <div class="field"><label class="lbl">01 · What was the plan?</label><textarea id="aarPlan"></textarea></div>
+      <div class="field"><label class="lbl">02 · What actually happened?</label><textarea id="aarActual"></textarea></div>
+      <div class="field"><label class="lbl">03 · Why the gap? (what was me, what was outside)</label><textarea id="aarGap"></textarea></div>
+      <div class="field"><label class="lbl">04 · One thing for tomorrow</label><textarea id="aarLesson"></textarea></div>
+      <div class="divider"></div>
+      <div class="grid2">
+        <div class="field"><label class="lbl">Grateful for</label><input id="aarG1"></div>
+        <div class="field"><label class="lbl">Also grateful for</label><input id="aarG2"></div>
+      </div>
+      <button class="btn primary full upper" onclick="saveAAR()">Close the day</button>
+    </div>
+
+    <div class="card tan">
+      <h2>Past Lessons</h2>
+      <div id="aarHistory" class="sub">No past reviews yet.</div>
+    </div>
+    <div id="creedAnchor_aar"></div>
+  </section>
+
+  <!-- ========== CREED / REF ========== -->
+  <section class="view" id="view-creed">
+    <div class="banner">
+      <h2>Reference · The Creed · The Tools</h2>
+      <p>What you're training to be able to say. And the clinical tools you're training with.</p>
+    </div>
+
+    <div class="card">
+      <h2>Where I stand today</h2>
+      <p class="sub" style="margin-top:-4px;line-height:1.7">
+        You haven't signed the creed yet. You haven't volunteered as a Ranger yet. Reading the words
+        is not the same as having earned them, and the app won't pretend otherwise.
+      </p>
+      <p class="sub" style="line-height:1.7">
+        The Creed below is the target — what you'll be able to say and mean when you're in. Until then it's
+        a training text: a standard, a shape, a checklist of what the man on the other side does. Notice which
+        lines land. Notice which ones feel far off. That distance is the work.
+      </p>
+    </div>
+
+    <div class="card tan">
+      <h2>Ranger Creed · target text</h2>
+      <p class="sub" style="margin-top:-4px;margin-bottom:10px">Written 1974, CSM Neal R. Gentry. Six stanzas: R · A · N · G · E · R. Read it. Don't claim it yet.</p>
+      <div id="creedFull"></div>
+      <div style="text-align:center;font-family:var(--mono);letter-spacing:.3em;color:var(--tan);padding:14px 0 4px;font-weight:700;font-size:12px">RANGERS LEAD THE WAY</div>
+    </div>
+
+    <div class="card">
+      <h2>Cognitive Distortions · CBT</h2>
+      <p class="sub" style="margin-top:-4px;margin-bottom:10px">Learn them well enough to name them in real time. That's most of the work.</p>
+      <div id="distortionsRef"></div>
+    </div>
+
+    <div class="card">
+      <h2>DBT Skills · Quick Reference</h2>
+      <div class="ref-block">
+        <h3>Mindfulness — What skills</h3>
+        <p><b>Observe</b> — notice without reacting. <b>Describe</b> — put words to it, factually. <b>Participate</b> — enter the experience fully.</p>
+      </div>
+      <div class="ref-block">
+        <h3>Mindfulness — How skills</h3>
+        <p><b>Non-judgmentally</b> — without good/bad labels. <b>One-mindfully</b> — one thing at a time. <b>Effectively</b> — do what works, not what's "right."</p>
+      </div>
+      <div class="ref-block">
+        <h3>Wise Mind</h3>
+        <p>The intersection of Reasonable Mind (logic, facts) and Emotion Mind (feelings, urgency). Decisions made from Wise Mind hold up over time. When unsure: sit with both, wait for the answer that feels BOTH clear AND true.</p>
+      </div>
+      <div class="ref-block">
+        <h3>Distress Tolerance — TIPP</h3>
+        <p>Temperature · Intense exercise · Paced breathing · Paired muscle relaxation. For crisis. Not a lifestyle — a pressure release.</p>
+      </div>
+      <div class="ref-block">
+        <h3>Distress Tolerance — ACCEPTS</h3>
+        <p><b>A</b>ctivities · <b>C</b>ontributing · <b>C</b>omparisons · <b>E</b>motions (opposite) · <b>P</b>ushing away · <b>T</b>houghts · <b>S</b>ensations. Distraction set when you need to ride out the peak.</p>
+      </div>
+      <div class="ref-block">
+        <h3>Emotion Regulation — PLEASE</h3>
+        <p>Treat <b>P</b>hysical illness · balanced <b>L</b>owering vulnerability / <b>E</b>ating · avoid mood-<b>A</b>ltering substances · balance <b>S</b>leep · <b>E</b>xercise. Every other skill works better on a regulated body.</p>
+      </div>
+      <div class="ref-block">
+        <h3>Interpersonal — GIVE (maintain the relationship)</h3>
+        <p><b>G</b>entle · <b>I</b>nterested · <b>V</b>alidate · <b>E</b>asy manner. When the relationship matters more than the ask.</p>
+      </div>
+      <div class="ref-block">
+        <h3>Interpersonal — FAST (keep self-respect)</h3>
+        <p><b>F</b>air · no <b>A</b>pologies for existing · <b>S</b>tick to values · <b>T</b>ruthful. When the line matters more than approval.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Standards</h2>
+      <div class="ref-block">
+        <h3>Our targets — hard goals</h3>
+        <ul>
+          <li><b>100</b> push-ups in 2 minutes</li>
+          <li><b>100</b> sit-ups in 2 minutes</li>
+          <li><b>20</b> chin-ups (dead-hang)</li>
+          <li>2-mile run in <b>12:00</b></li>
+          <li>5-mile run in <b>32:00</b></li>
+          <li>12-mile ruck (47 lb) in <b>2:15</b></li>
+        </ul>
+        <p style="margin:6px 0 0;color:var(--ink-dim);font-size:13px">These are the numbers we train toward. The mind gets built at the pace that forces it to show up.</p>
+      </div>
+      <div class="ref-block">
+        <h3>Ranger School floor — reference only</h3>
+        <ul>
+          <li><b>49</b> push-ups / <b>59</b> sit-ups / <b>6</b> chin-ups</li>
+          <li>5-mile run ≤ <b>40:00</b> · 12-mile ruck ≤ <b>3:00</b></li>
+        </ul>
+        <p style="margin:6px 0 0;color:var(--ink-dim);font-size:13px">RAP Week entry gates. Roughly 60% of all Ranger School failures happen here — not because the floor is high, but because most men haven't trained above it.</p>
+      </div>
+      <div class="ref-block">
+        <h3>Steady state (what the target buys you)</h3>
+        <ul>
+          <li>~20 hr training / day · ~3.5 hr sleep / night</li>
+          <li>~2,200 cal / day against 6,000+ burn</li>
+          <li>65–90 lb gear, carried</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card plain">
+      <h2>Sources</h2>
+      <div class="sub" style="line-height:1.8">
+        CBT — Judith Beck, <i>Cognitive Behavior Therapy: Basics and Beyond</i>. David Burns, <i>Feeling Good</i>.<br>
+        DBT — Marsha Linehan, <i>DBT Skills Training Manual</i> (Guilford Press).<br>
+        Cyclic sighing — Balban et al., <i>Cell Reports Medicine</i> (2023), Stanford / Huberman lab.<br>
+        Box breathing — adapted from SEAL training, popularized by Mark Divine (SEALFIT).<br>
+        Ranger standards — U.S. Army Ranger Training Brigade, Fort Moore.<br>
+        AAR framework — U.S. Army FM 7-0, Appendix K.<br>
+        Ranger Creed — CSM Neal R. Gentry, 1974.
+      </div>
+    </div>
+    <div class="card">
+      <h2>Sources · the work behind the work</h2>
+      <p class="sub" style="margin-top:-4px;margin-bottom:12px">Every protocol in this app is sourced. If a tool does not have a citation behind it, it is not in here. Read the originals when you can — the secondary sources lose nuance.</p>
+      <details><summary><b>Cognitive Behavioral Therapy</b></summary><div class="body">
+        Beck, A. T. (1979). <i>Cognitive Therapy of Depression.</i> Guilford Press.<br>
+        Beck, J. S. (2020). <i>Cognitive Behavior Therapy: Basics and Beyond</i> (3rd ed.). Guilford Press.<br>
+        Burns, D. D. (1980, rev. 2008). <i>Feeling Good: The New Mood Therapy.</i> Avon. The 11 distortions referenced in MIND are his framing.
+      </div></details>
+      <details><summary><b>Dialectical Behavior Therapy</b></summary><div class="body">
+        Linehan, M. M. (2014). <i>DBT Skills Training Manual</i> (2nd ed.). Guilford Press. Source for TIPP, Check-the-Facts, Opposite Action, DEAR MAN, PLEASE, GIVE, FAST, Wise Mind, ACCEPTS.
+      </div></details>
+      <details><summary><b>Breath protocols</b></summary><div class="body">
+        Box breathing — popularized by Mark Divine (SEALFIT); rooted in pranayama traditions.<br>
+        Cyclic sighing — Balban, M. Y., Neukirch, A., Spiegel, D., Huberman, A. D., et al. (2023). “Brief structured respiration practices enhance mood and reduce physiological arousal.” <i>Cell Reports Medicine</i>, 4(1).
+      </div></details>
+      <details><summary><b>After-Action Review</b></summary><div class="body">
+        U.S. Army (2008). <i>FM 7-0: Training for Full Spectrum Operations,</i> Appendix K. The four-question structure (plan / actual / why the gap / one thing) is doctrine.
+      </div></details>
+      <details><summary><b>Periodization &amp; phase model</b></summary><div class="body">
+        Bompa, T. O., &amp; Haff, G. G. (2018). <i>Periodization: Theory and Methodology of Training</i> (6th ed.). Human Kinetics. The seven-phase model used here is a simplified application.<br>
+        Friel, J. (2018). <i>The Triathlete’s Training Bible</i> (4th ed.). VeloPress.<br>
+        Mountain Tactical Institute (Rob Shaul). Open SOF-prep training plans (mtntactical.com). The weekly templates draw on this lineage.<br>
+        American College of Sports Medicine (2022). <i>ACSM’s Guidelines for Exercise Testing and Prescription</i> (11th ed.). Wolters Kluwer. Aerobic-base prescription.
+      </div></details>
+      <details><summary><b>Sleep &amp; recovery</b></summary><div class="body">
+        Walker, M. (2017). <i>Why We Sleep.</i> Scribner.<br>
+        Hirshkowitz, M. et al. (2015). “National Sleep Foundation’s sleep time duration recommendations: methodology and results summary.” <i>Sleep Health</i>, 1(1).<br>
+        Borg, G. (1982). “Psychophysical bases of perceived exertion.” <i>Medicine &amp; Science in Sports &amp; Exercise</i>, 14(5). The RPE scale.<br>
+        Buysse, D. J. et al. (1989). “The Pittsburgh Sleep Quality Index.” <i>Psychiatry Research</i>, 28(2). Sleep-quality framing simplified to 1–5.
+      </div></details>
+      <details><summary><b>Habits &amp; implementation</b></summary><div class="body">
+        Gollwitzer, P. M. (1999). “Implementation intentions: Strong effects of simple plans.” <i>American Psychologist</i>, 54(7). Why “when/where/how” beats vague intent.<br>
+        Fogg, B. J. (2019). <i>Tiny Habits: The Small Changes That Change Everything.</i> Houghton Mifflin Harcourt.<br>
+        Clear, J. (2018). <i>Atomic Habits.</i> Avery.
+      </div></details>
+      <details><summary><b>Stress inoculation</b></summary><div class="body">
+        Meichenbaum, D. (1985). <i>Stress Inoculation Training.</i> Pergamon. The original framework for graded exposure to controlled stress.
+      </div></details>
+      <details><summary><b>Ranger doctrine</b></summary><div class="body">
+        U.S. Army Ranger Training Brigade — official Ranger Course standards (Fort Moore, formerly Fort Benning).<br>
+        Ranger Creed — CSM Neal R. Gentry (1974), 75th Ranger Regiment.
+      </div></details>
+    </div>
+
+  </section>
+
+</main>
+
+<nav class="tabs">
+  <button data-tab="brief"><svg viewBox="0 0 24 24"><path d="M12 3l9 4v5c0 5-4 8-9 9-5-1-9-4-9-9V7l9-4z"/></svg>BRIEF</button>
+  <button data-tab="pt"><svg viewBox="0 0 24 24"><path d="M6 7h2v10H6zM16 7h2v10h-2zM8 10h8v4H8zM3 9h3v6H3zM18 9h3v6h-3z"/></svg>PT</button>
+  <button data-tab="ledger"><svg viewBox="0 0 24 24"><path d="M4 4h14l2 2v14H4zM4 9h16M8 13h8M8 17h5"/></svg>LEDGER</button>
+  <button data-tab="mind"><svg viewBox="0 0 24 24"><path d="M9 3a6 6 0 00-6 6v4a3 3 0 003 3h1v3a2 2 0 002 2h2v-8M15 3a6 6 0 016 6v4a3 3 0 01-3 3h-1v3a2 2 0 01-2 2h-2"/></svg>MIND</button>
+  <button data-tab="aar"><svg viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5zM9 9h6M9 13h6M9 17h4"/></svg>AAR</button>
+  <button data-tab="creed"><svg viewBox="0 0 24 24"><path d="M12 2l3 6 6 1-4.5 4.5L18 20l-6-3-6 3 1.5-6.5L3 9l6-1z"/></svg>CREED</button>
+</nav>
+
+<div id="toast"></div>
+
+<script>
+/* =====================================================================
+   State
+   ===================================================================== */
+const LS = "suasponte.v3";
+const dk = () => new Date().toISOString().slice(0,10);
+
+const DEFAULTS = {
+  startDate: dk(),
+  phase: "base",
+  weekly: { mon:"", tue:"", wed:"", thu:"", fri:"", sat:"", sun:"" },
+  days: {},
+  build: [
+    { id: "wake", label: "Wake before 0600", streak:0 },
+    { id: "read", label: "Read 20 min (book, not phone)", streak:0 },
+    { id: "cold", label: "Cold exposure (30–60s)", streak:0 }
+  ],
+  kill: [
+    { id: "scroll", label: "No mindless scrolling", streak:0 }
+  ],
+  bests: { pushups:0, situps:0, pullups:0, run2:0, run5:0, ruck:0 },
+  tr: [], dm: [], cf: [],
+  stanzaEpoch: Math.floor(new Date().setHours(0,0,0,0) / 86400000)
+};
+
+let state = load();
+function load(){ try{ const r=localStorage.getItem(LS); if(!r) return JSON.parse(JSON.stringify(DEFAULTS));
+  return Object.assign(JSON.parse(JSON.stringify(DEFAULTS)), JSON.parse(r)); }catch(e){ return JSON.parse(JSON.stringify(DEFAULTS)); } }
+function save(){ localStorage.setItem(LS, JSON.stringify(state)); }
+function today(){ const k=dk(); if(!state.days[k]) state.days[k] = { mission:{}, pt:{}, habits:{build:{},kill:{}}, please:{}, aar:{}, recovery:{} }; if(!state.days[k].recovery) state.days[k].recovery = {}; return state.days[k]; }
+
+/* =====================================================================
+   Content
+   ===================================================================== */
+const CREED = [
+  { letter:"R", text:"Recognizing that I volunteered as a Ranger, fully knowing the hazards of my chosen profession, I will always endeavor to uphold the prestige, honor, and high esprit de corps of my Ranger Regiment." },
+  { letter:"A", text:"Acknowledging the fact that a Ranger is a more elite soldier who arrives at the cutting edge of battle by land, sea, or air, I accept the fact that as a Ranger my country expects me to move further, faster and fight harder than any other soldier." },
+  { letter:"N", text:"Never shall I fail my comrades. I will always keep myself mentally alert, physically strong and morally straight and I will shoulder more than my share of the task whatever it may be, one-hundred-percent and then some." },
+  { letter:"G", text:"Gallantly will I show the world that I am a specially selected and well-trained soldier. My courtesy to superior officers, neatness of dress and care of equipment shall set the example for others to follow." },
+  { letter:"E", text:"Energetically will I meet the enemies of my country. I shall defeat them on the field of battle for I am better trained and will fight with all my might. Surrender is not a Ranger word. I will never leave a fallen comrade to fall into the hands of the enemy and under no circumstances will I ever embarrass my country." },
+  { letter:"R", text:"Readily will I display the intestinal fortitude required to fight on to the Ranger objective and complete the mission though I be the lone survivor." }
+];
+
+const DISTORTIONS = [
+  { k:"All-or-nothing",        d:"Black-and-white thinking. 'If it's not perfect, it's a failure.' The middle gets erased." },
+  { k:"Overgeneralization",    d:"One event becomes a pattern. 'Always,' 'never.' One bad workout becomes 'I never follow through.'" },
+  { k:"Mental filter",         d:"Only seeing what confirms the negative. Three good moments disappear; one bad moment defines the day." },
+  { k:"Discounting positive",  d:"When something goes well, 'that doesn't count.' Shrinks wins, inflates losses." },
+  { k:"Mind reading",          d:"Assuming you know what someone else thinks (usually the worst) without checking." },
+  { k:"Fortune telling",       d:"Predicting the future as if certain. 'This is going to go badly.'" },
+  { k:"Catastrophizing",       d:"Worst-possible-outcome thinking. Molehill to mountain." },
+  { k:"Emotional reasoning",   d:"'I feel it, so it must be true.' Feelings treated as evidence for facts." },
+  { k:"Should statements",     d:"'I should be further along.' 'He shouldn't act that way.' Rigid rules — self-flagellating or blame-assigning." },
+  { k:"Labeling",              d:"'I'm a failure.' 'He's a jerk.' Turning a behavior into an identity." },
+  { k:"Personalization",       d:"Taking all the blame for outcomes that weren't all yours — or shifting all of it outward." }
+];
+
+/* PLEASE — what Recovery doesn't already capture quantitatively.
+   Sleep was here as a boolean; it's now a number on the Recovery card. Don't double-track. */
+const PLEASE_ITEMS = [
+  { id:"eat",   label:"Ate (protein + produce, real meals)" },
+  { id:"moved", label:"Moved the body today (any movement, not just structured PT)" },
+  { id:"sub",   label:"No mood-altering substances" },
+  { id:"ill",   label:"Treating any illness / injury (not pushing through)" }
+];
+
+/* Targets are HARD GOALS — not Ranger School minimums. The floor is just a reference.
+   Real selection doesn't separate on floors; it separates on who kept training past them.
+   Hit these and RAP Week is a warmup. */
+const STANDARDS = [
+  { id:"pushups", name:"Push-ups (2 min)",     unit:"reps", target:100,  floor:49,    kind:"reps" },
+  { id:"situps",  name:"Sit-ups (2 min)",      unit:"reps", target:100,  floor:59,    kind:"reps" },
+  { id:"pullups", name:"Chin-ups (dead-hang)", unit:"reps", target:20,   floor:6,     kind:"reps" },
+  { id:"run2",    name:"2-mile run",           unit:"time", target:720,  floor:942,   kind:"time" },  // 12:00  (floor 15:42)
+  { id:"run5",    name:"5-mile run",           unit:"time", target:1920, floor:2400,  kind:"time" },  // 32:00  (floor 40:00)
+  { id:"ruck",    name:"12-mile ruck (47 lb)", unit:"time", target:8100, floor:10800, kind:"time" }   // 2:15   (floor 3:00)
+];
+
+function toSec(s){ if(!s) return 0; const p=String(s).trim().split(":").map(Number); if(p.some(isNaN)) return 0;
+  if(p.length===1) return p[0]; if(p.length===2) return p[0]*60+p[1]; return p[0]*3600+p[1]*60+p[2]; }
+function fmtTime(sec){ if(!sec) return "—"; sec=Math.round(sec); const h=Math.floor(sec/3600), m=Math.floor((sec%3600)/60), s=sec%60;
+  return h? `${h}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}` : `${m}:${String(s).padStart(2,"0")}`; }
+function pctOf(std, val){ if(!val) return 0; const p = std.kind==="reps" ? val/std.target : std.target/val; return Math.min(1, Math.max(0,p)); }
+function pastFloor(std, val){ if(!val) return false; return std.kind==="reps" ? val >= std.floor : val <= std.floor; }
+function engineScore(){ return Math.round(STANDARDS.reduce((a,s)=>a+pctOf(s, state.bests[s.id]||0),0) / STANDARDS.length * 100); }
+
+/* =====================================================================
+   Render
+   ===================================================================== */
+/* =====================================================================
+   Phases · long-arc context (Bompa & Haff, Periodization, 6th ed, 2018)
+   ===================================================================== */
+const PHASES = {
+  base: {
+    label:"Base building", duration:"8\u201316 weeks",
+    desc:"General fitness, habit foundation. Volume over intensity.",
+    emphasis:"Aerobic base + movement quality. Sub-max volume.",
+    weekly:[
+      "5 days running \u2014 3 easy zone-2 + 1 tempo/intervals + 1 long aerobic",
+      "3 days strength \u2014 full body, 3\u00d78\u201312 at moderate load, no failure work",
+      "2 ruck sessions \u2014 30\u201360 min at 30\u201345 lb to start, build slowly",
+      "PT events 2\u00d7/wk \u2014 high-volume submax (e.g. 5\u00d715 push-ups, 3\u00d78 pull-ups)",
+      "1 full rest day \u00b7 1 mobility-only day"
+    ],
+    pitfalls:"Going too hard. Base only works if most of it feels easy. If every session is a fight, you skipped this phase."
+  },
+  specific: {
+    label:"Specific prep", duration:"8\u201312 weeks",
+    desc:"Ranger-shape training. Targets in sight. Specificity dominates.",
+    emphasis:"Event-specific volume + steady ruck progression.",
+    weekly:[
+      "PT events 2\u00d7/wk \u2014 push-ups, sit-ups, pull-ups in 2-min sets, working toward target",
+      "Run 4\u20135\u00d7/wk \u2014 2-mile and 5-mile pace work, hill repeats, 1 long",
+      "Ruck 2\u00d7/wk \u2014 Saturday long 8\u201312 mi at 47 lb, midweek 4\u20136 mi load build",
+      "Strength 2\u20133\u00d7/wk \u2014 squat, deadlift, press, pull-ups, core emphasis",
+      "1 rest day \u00b7 1 mobility/yoga day"
+    ],
+    pitfalls:"Adding ruck load AND distance the same week. Stress fractures live there. Skipping the long ruck."
+  },
+  peak: {
+    label:"Peak / pre-school", duration:"4\u20136 weeks",
+    desc:"Sharpening. Volume drops; intensity peaks. Recovery is sacred.",
+    emphasis:"Max-effort PT events + deload before report date.",
+    weekly:[
+      "PT events 2\u00d7/wk \u2014 full-effort 2-min push-ups, sit-ups; max pull-ups",
+      "Run 3\u00d7/wk \u2014 1 fast 2-mile, 1 fast 5-mile, 1 easy recovery",
+      "Ruck 1\u00d7/wk \u2014 moderate 4\u20136 mi at 47 lb (no max sessions in this phase)",
+      "Strength 2\u00d7/wk \u2014 full body, low volume, moderate intensity. No max lifts.",
+      "Sleep 8+ hr nightly \u00b7 Final week: deload all sessions ~50%, full carbs, full sleep"
+    ],
+    pitfalls:"Peaking too early. Cramming volume in the last 2 weeks. Both shred you for selection."
+  },
+  school: {
+    label:"In-school", duration:"61 days",
+    desc:"At Fort Moore. Survival mode.",
+    emphasis:"Don\u2019t injure. Don\u2019t quit. Eat, hydrate, recover when you can.",
+    weekly:[
+      "PT and movement set by cadre \u2014 you are not the program now, you are in it",
+      "Sleep whenever it is offered, 20-min naps count",
+      "Hot food and water are mandatory, not optional",
+      "App use: AAR (even one line) and mission lock-in only when safe",
+      "No personal supplemental training"
+    ],
+    pitfalls:"Hero attempts on PT events. Most failures are foot/leg injuries from poor blister management or load mistakes."
+  },
+  active: {
+    label:"Active duty", duration:"ongoing",
+    desc:"Maintain the engine on a unit\u2019s schedule.",
+    emphasis:"Hold the floor; sustain mind and body.",
+    weekly:[
+      "PT 4\u00d7/wk \u2014 varied, follow the unit calendar",
+      "Personal supplemental \u2014 2 quality sessions targeting your weakest event",
+      "Ruck 1\u00d7/wk minimum \u2014 hold long-ruck capacity",
+      "Sleep \u22657 hr most nights; protect it like a weapon"
+    ],
+    pitfalls:"Letting unit PT drift you toward weakest-link fitness. Supplement on your own."
+  },
+  recovery: {
+    label:"Recovery / injury", duration:"as long as needed",
+    desc:"Repair phase.",
+    emphasis:"Heal first. Habits and mind work continue.",
+    weekly:[
+      "Cleared exercise only \u2014 follow medical guidance, no gym-rat overrides",
+      "Aerobic substitution as cleared (bike, swim, ruck if cleared)",
+      "Mobility / rehab exercises 5\u20137\u00d7/wk",
+      "Sleep + nutrition matter MORE during recovery, not less",
+      "Mind work, AAR, habits stay daily"
+    ],
+    pitfalls:"Coming back too fast. Re-injury sets you back further than the rest would have."
+  },
+  maintenance: {
+    label:"Maintenance", duration:"off-cycle",
+    desc:"Hold the floor; do not lose the engine.",
+    emphasis:"Minimum effective dose. Engine decay is real.",
+    weekly:[
+      "2 quality sessions/wk \u2014 1 strength, 1 endurance",
+      "1 ruck or long aerobic per week \u2014 hold base capacity",
+      "PT events: hit each at least monthly so you know where the engine is"
+    ],
+    pitfalls:"Going to zero. Floor capacity drops fast after 4 weeks of no training."
+  }
+};
+
+/* Phase prescriptions are scaffolding, not gospel.
+   Sources: Bompa & Haff (Periodization, 2018); Mountain Athlete / MTN Tactical (Rob Shaul);
+   ACSM aerobic-base guidelines; common SOF-prep doctrine. A qualified coach who has
+   seen you move and knows your history outperforms any generic plan. */
+function setPhase(key){ if(!PHASES[key]) return; state.phase = key; save(); render(); toast("Phase: " + PHASES[key].label); }
+function currentPhase(){ return PHASES[state.phase] || PHASES.base; }
+
+/* =====================================================================
+   Data permanence \u2014 export / import
+   ===================================================================== */
+function exportData(){
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type:"application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "suasponte-" + dk() + ".json";
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  toast("Data exported");
+}
+function importData(file){
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const incoming = JSON.parse(e.target.result);
+      if(!confirm("Replace current data with imported data? This cannot be undone.")) return;
+      state = Object.assign(JSON.parse(JSON.stringify(DEFAULTS)), incoming);
+      save(); render();
+      toast("Data imported");
+    } catch(err){ toast("Import failed: " + (err.message||"bad file"), 3000); }
+  };
+  reader.readAsText(file);
+}
+
+/* =====================================================================
+   Recovery \u2014 sleep, RPE, soreness  (Walker 2017; Borg 1982; Buysse PSQI 1989, simplified)
+   ===================================================================== */
+function saveRecovery(){
+  const t = today();
+  const qChip = document.querySelector('#recQualityChips .chip.selected');
+  const sChip = document.querySelector('#recSorenessChips .chip.selected');
+  const rpeChip = document.querySelector('#recRpeChips .chip.selected');
+  t.recovery = {
+    hours:    Number(v("recHours")) || 0,
+    quality:  qChip ? Number(qChip.dataset.val) : 0,
+    rpe:      rpeChip ? Number(rpeChip.dataset.val) : 0,
+    soreness: sChip ? sChip.dataset.val : "",
+    t: Date.now()
+  };
+  save(); renderRecovery(); toast("Recovery logged");
+}
+function selectRecChip(group, val){
+  document.querySelectorAll('#'+group+' .chip').forEach(c => c.classList.remove("selected"));
+  const el = [...document.querySelectorAll('#'+group+' .chip')].find(c => c.dataset.val === String(val));
+  if(el) el.classList.add("selected");
+}
+
+/* =====================================================================
+   Trends \u2014 rolling stats per event (30 / 90 / all-time)
+   ===================================================================== */
+function trendsFor(stdId){
+  const now = Date.now();
+  const D30 = 30*86400000, D90 = 90*86400000;
+  const sessions = [];
+  for(const k in state.days){
+    const day = state.days[k];
+    const v = day && day.pt ? day.pt[stdId] : 0;
+    if(typeof v === "number" && v > 0){
+      sessions.push({ k, t: new Date(k).getTime(), v });
+    }
+  }
+  sessions.sort((a,b)=>a.t-b.t);
+  const std = STANDARDS.find(s => s.id === stdId);
+  const isReps = std.kind === "reps";
+  const bestOf = arr => arr.length ? (isReps ? Math.max(...arr.map(x=>x.v)) : Math.min(...arr.map(x=>x.v))) : 0;
+  const last30 = sessions.filter(x => now - x.t <= D30);
+  const last90 = sessions.filter(x => now - x.t <= D90);
+  return {
+    sessionsAll: sessions.length, sessions30: last30.length, sessions90: last90.length,
+    best30:  bestOf(last30), best90: bestOf(last90), bestAll: bestOf(sessions),
+    firstDate: sessions[0] ? sessions[0].k : null
+  };
+}
+
+/* Creed anchors — each stanza mapped to the tab where it actually lives */
+const CREED_MAP = {
+  R1: {
+    letter:"R", label:"Recognition · the volunteer",
+    stanza:"Recognizing that I volunteered as a Ranger, fully knowing the hazards of my chosen profession, I will always endeavor to uphold the prestige, honor, and high esprit de corps of my Rangers.",
+    meaning:"The first R is consent. You chose this. The weight of the standard rests on that choice, not on pressure or circumstance. This is why the morning starts with a lock-in — it is a claim, not a prescription."
+  },
+  A: {
+    letter:"A", label:"Acknowledgment · further, faster, harder",
+    stanza:"Acknowledging the fact that a Ranger is a more elite Soldier who arrives at the cutting edge of battle by land, sea, or air, I accept the fact that as a Ranger my country expects me to move further, faster, and fight harder than any other Soldier.",
+    meaning:"Further, faster, harder. The engine exists for this stanza. Targets are the honest translation of that expectation into numbers you can train against; floors only prove you got in the door."
+  },
+  N: {
+    letter:"N", label:"Never fail my comrades · the three alignments",
+    stanza:"Never shall I fail my comrades. I will always keep myself mentally alert, physically strong, and morally straight and I will shoulder more than my share of the task whatever it may be, one-hundred-percent and then some.",
+    meaning:"Mentally alert. Physically strong. Morally straight. The mind work is not an accessory — it is half the creed. Failing comrades is not only dying on them; it is showing up foggy, resentful, or unresolved."
+  },
+  G: {
+    letter:"G", label:"Gallantry · care of equipment, daily",
+    stanza:"Gallantly will I show the world that I am a specially selected and well-trained Soldier. My courtesy to superior officers, neatness of dress, and care of equipment shall set the example for others to follow.",
+    meaning:"Care of equipment. Neatness of dress. Courtesy. The small things, daily. Habits are how you care for the instrument you take into hard places. Skip the small and the big does not hold."
+  },
+  E: {
+    letter:"E", label:"Energetic engagement · surrender is not a Ranger word",
+    stanza:"Energetically will I meet the enemies of my country. I shall defeat them on the field of battle for I am better trained and will fight with all my might. Surrender is not a Ranger word. I shall never leave a fallen comrade to fall into the hands of the enemy and under no circumstances will I ever embarrass my country.",
+    meaning:"Surrender is not a Ranger word. Opposite Action is surrender\u2019s opposite — when the emotion screams retreat, the training says engage. Fully, not halfway. This is why the Check-the-Facts card lives in this app: to catch the moments when the urge to pull back is a feeling, not a fact."
+  },
+  R2: {
+    letter:"R", label:"Readiness · intestinal fortitude, lone survivor",
+    stanza:"Readily will I display the intestinal fortitude required to fight on to the Ranger objective and complete the mission though I be the lone survivor.",
+    meaning:"Intestinal fortitude. The unglamorous grit of closing the day honestly — plan vs. actual, gap, lesson — without flinching. This is where the creed actually lives: in the willingness to look at what happened and not lie about it."
+  }
+};
+function creedCard(key){
+  const c = CREED_MAP[key]; if(!c) return "";
+  return `<div class="card" style="border-left:3px solid var(--tan);background:linear-gradient(180deg,rgba(196,168,107,.04),transparent);margin-top:18px">
+    <div style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--tan);margin-bottom:6px">CREED &middot; ${c.letter} &middot; ${c.label.toUpperCase()}</div>
+    <p style="font-size:13px;line-height:1.75;margin:0 0 10px;font-style:italic;color:var(--ink)">&ldquo;${c.stanza}&rdquo;</p>
+    <p class="sub" style="margin:0;line-height:1.65;font-size:13px">${c.meaning}</p>
+  </div>`;
+}
+function renderCreedAnchors(){
+  const set = (id,key) => { const el = document.getElementById(id); if(el) el.innerHTML = creedCard(key); };
+  set("creedAnchor_pt",    "A");
+  set("creedAnchor_ledger","G");
+  set("creedAnchor_mind",  "N");
+  set("creedAnchor_aar",   "R2");
+}
+
+function render(){ renderHeader(); renderBrief(); renderPT(); renderLedger(); renderMind(); renderAAR(); renderCreed(); renderCreedAnchors(); renderPhase(); renderRecovery(); renderTrends(); renderCoachRead(); renderTodaySession(); renderWeeklyTemplate(); }
+
+function renderHeader(){
+  const start = new Date(state.startDate); const now = new Date();
+  const days = Math.max(1, Math.floor((now.setHours(0,0,0,0)-start.setHours(0,0,0,0))/86400000)+1);
+  document.getElementById("dayNum").textContent = String(days).padStart(3,"0");
+  document.getElementById("dateStr").textContent = new Date().toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"}).toUpperCase();
+}
+
+function renderBrief(){
+  const h = new Date().getHours();
+  const greet = h<5 ? "Late, Oliver." : h<12 ? "Morning, Oliver." : h<17 ? "Mid-day, Oliver." : "Evening, Oliver.";
+  document.getElementById("briefGreet").textContent = greet;
+  document.getElementById("briefSub").textContent =
+    h<5 ? "Sleep is a weapon. Close the day, get horizontal." :
+    h<12 ? "Lock in the mission before the world gets loud." :
+    h<17 ? "Still time to reclaim this one. Set the intent." :
+           "Tomorrow's brief is cleaner written tonight.";
+
+  // score ring
+  const score = engineScore();
+  const circ = 2 * Math.PI * 44;
+  document.getElementById("scoreArc").setAttribute("stroke-dashoffset", circ - (score/100)*circ);
+  document.getElementById("scoreNum").textContent = score;
+  document.getElementById("scoreCall").textContent =
+    score < 40 ? "Early days. Your job is to log something. Start anywhere." :
+    score < 70 ? "In the fight. Pick one lift this week. Move it." :
+    score < 100 ? "Past the floor. Keep pulling the target toward you." :
+                  "Target hit. Raise it. The engine needs resistance to grow.";
+
+  // stanza rotating (stable by day) — pairs the creed text with its interpretation
+  const idx = Math.abs(Math.floor(Date.now()/86400000 - (state.stanzaEpoch||0))) % 6;
+  const stanza_ = CREED[idx];
+  const mapKeys = ["R1","A","N","G","E","R2"];
+  const cm = (typeof CREED_MAP !== "undefined") ? CREED_MAP[mapKeys[idx]] : null;
+  const meaning = cm ? `<div class="sub" style="margin-top:10px;line-height:1.65;font-size:13px;border-left:2px solid var(--line);padding-left:10px">${cm.meaning}</div>` : "";
+  document.getElementById("stanzaOfDay").innerHTML =
+    `<div class="stanza"><span class="letter">${stanza_.letter}</span><p>${stanza_.text}</p></div>${meaning}`;
+
+  // mission fields
+  const t = today();
+  document.getElementById("missionPrimary").value = t.mission.primary||"";
+  document.getElementById("missionS1").value = t.mission.s1||"";
+  document.getElementById("missionS2").value = t.mission.s2||"";
+  document.getElementById("missionS3").value = t.mission.s3||"";
+  document.getElementById("missionWhy").value = t.mission.why||"";
+
+  // PLEASE checklist
+  document.getElementById("pleaseList").innerHTML = PLEASE_ITEMS.map(x => `
+    <div class="check-row ${t.please[x.id]?"done":""}" onclick="togglePlease('${x.id}')">
+      <span class="ck"></span><span class="txt">${x.label}</span>
+    </div>`).join("");
+
+  // today's habits
+  const rows = [...state.build.map(x => ({...x, kind:"build"})), ...state.kill.map(x => ({...x, kind:"kill"}))];
+  document.getElementById("todayHabits").innerHTML = rows.length ? rows.map(x => {
+    const done = !!t.habits[x.kind][x.id];
+    const kl = x.kind==="kill" ? " kill" : "";
+    const streak = `<span class="streak">${x.streak}d</span>`;
+    return `<div class="check-row${kl} ${done?"done":""}" onclick="toggleHabit('${x.kind}','${x.id}')">
+      <span class="ck"></span><span class="txt">${esc(x.label)}</span>${streak}
+    </div>`;
+  }).join("") : `<div class="sub">Add habits on the LEDGER tab.</div>`;
+}
+
+function renderPT(){
+  const t = today();
+  document.getElementById("stdList").innerHTML = STANDARDS.map(s => {
+    const best = state.bests[s.id]||0;
+    const pct = Math.round(pctOf(s,best)*100);
+    const targetStr = s.kind==="reps" ? `target ${s.target}` : `target ${fmtTime(s.target)}`;
+    const floorStr  = s.kind==="reps" ? `floor ${s.floor}` : `floor ${fmtTime(s.floor)}`;
+    const over = pastFloor(s, best);
+    const curLabel = best
+      ? `Best: ${s.kind==="reps"?best:fmtTime(best)} · ${pct}% of target${over?" · past floor":""}`
+      : `Best: —`;
+    const placeholder = s.kind==="reps" ? "reps" : "mm:ss";
+    const logVal = t.pt[s.id] || "";
+    const disp = logVal ? (s.kind==="reps" ? logVal : fmtTime(logVal)) : "";
+    return `<div class="std">
+      <div class="lbl-row"><span class="name">${s.name}</span><span class="tgt">${targetStr} · ${floorStr}</span></div>
+      <div class="bar ${pct>=100?"done":""}"><i style="width:${Math.min(100,pct)}%"></i></div>
+      <div class="cur">${curLabel}</div>
+      <input id="log_${s.id}" value="${disp}" placeholder="${placeholder}" inputmode="${s.kind==='reps'?'numeric':'text'}">
+    </div>`;
+  }).join("");
+
+
+  renderReadiness();
+}
+
+/* Readiness Map — two tiers, auto-ticked from state */
+function computeReadiness(){
+  const bests = state.bests || {};
+  const targetsHit = STANDARDS.filter(s => {
+    const b = bests[s.id]||0;
+    return b > 0 && (s.kind==="reps" ? b >= s.target : b <= s.target);
+  }).length;
+  const score = engineScore();
+
+  // AAR streak — consecutive days ending today with a non-empty lesson
+  let aarStreak = 0;
+  const d = new Date();
+  for(let i=0;i<365;i++){
+    const k = d.toISOString().slice(0,10);
+    const day = (state.days||{})[k];
+    if(day && day.aar && (day.aar.lesson||"").trim()) aarStreak++;
+    else if(i>0) break; // skip today if empty; break on the first non-today miss
+    d.setDate(d.getDate()-1);
+  }
+  const maxBuildStreak = (state.build||[]).reduce((a,h)=>Math.max(a,h.streak||0), 0);
+
+  const tier1 = STANDARDS.map(s => {
+    const b = bests[s.id]||0;
+    const ok = pastFloor(s, b);
+    const floorDisp = s.kind==="reps" ? s.floor : fmtTime(s.floor);
+    const bestDisp = b ? (s.kind==="reps" ? b : fmtTime(b)) : "—";
+    return { ok, label: `${s.name} past floor (${floorDisp})`, note: `best ${bestDisp}` };
+  });
+
+  const tier2 = [
+    { ok: targetsHit >= 1, label: "Hit target on 1 event",           note: `${targetsHit}/6` },
+    { ok: targetsHit >= 3, label: "Hit target on 3 events",          note: `${targetsHit}/6` },
+    { ok: targetsHit >= 6, label: "Hit target on all 6 events",      note: `${targetsHit}/6` },
+    { ok: aarStreak >= 14, label: "Close the day 14 days running",   note: `${aarStreak}-day streak` },
+    { ok: maxBuildStreak >= 30, label: "30-day build-habit streak",  note: `longest: ${maxBuildStreak}d` },
+    { ok: score >= 80,     label: "Engine score ≥ 80",               note: `now: ${score}` },
+  ];
+  return { tier1, tier2, score };
+}
+function renderReadiness(){
+  const el = document.getElementById("readinessMap"); if(!el) return;
+  const { tier1, tier2 } = computeReadiness();
+  const ticked = n => n ? '<span style="color:var(--tan);font-family:var(--mono)">[X]</span>' : '<span style="color:var(--ink-dim);font-family:var(--mono)">[ ]</span>';
+  const row = it => `<div style="display:flex;justify-content:space-between;gap:8px;padding:4px 0;font-size:13px;line-height:1.5">
+      <span>${ticked(it.ok)} ${it.label}</span>
+      <span class="sub" style="font-size:11px;white-space:nowrap">${it.note}</span>
+    </div>`;
+  const tier1Hits = tier1.filter(x=>x.ok).length;
+  const tier2Hits = tier2.filter(x=>x.ok).length;
+  el.innerHTML = `
+    <div style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
+        <h3 style="margin:0;font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--tan)">Ready to sign · the door</h3>
+        <span class="sub" style="font-family:var(--mono);font-size:11px">${tier1Hits}/6</span>
+      </div>
+      <p class="sub" style="margin:0 0 6px;font-size:11px;line-height:1.5">Past floor on every event. This is the honest threshold to volunteer.</p>
+      ${tier1.map(row).join("")}
+    </div>
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line)">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
+        <h3 style="margin:0;font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--tan)">Ready for the school · the engine</h3>
+        <span class="sub" style="font-family:var(--mono);font-size:11px">${tier2Hits}/6</span>
+      </div>
+      <p class="sub" style="margin:0 0 6px;font-size:11px;line-height:1.5">Higher-order readiness. The things that separate "gets in" from "finishes."</p>
+      ${tier2.map(row).join("")}
+    </div>
+  `;
+}
+
+function renderLedger(){
+  const t = today();
+  document.getElementById("buildList").innerHTML = state.build.length ? state.build.map(h => `
+    <div class="check-row ${t.habits.build[h.id]?"done":""}" onclick="toggleHabit('build','${h.id}')">
+      <span class="ck"></span><span class="txt">${esc(h.label)}</span>
+      <span class="streak">${h.streak}d</span>
+      <button class="btn sm ghost" style="padding:3px 8px;font-size:11px" onclick="event.stopPropagation();removeHabit('build','${h.id}')">×</button>
+    </div>`).join("") : `<div class="sub">Add a habit below.</div>`;
+
+  document.getElementById("killList").innerHTML = state.kill.length ? state.kill.map(h => `
+    <div class="check-row kill ${t.habits.kill[h.id]?"done":""}" onclick="toggleHabit('kill','${h.id}')">
+      <span class="ck"></span><span class="txt">${esc(h.label)}</span>
+      <span class="streak">${h.streak}d</span>
+      <button class="btn sm ghost" style="padding:3px 8px;font-size:11px" onclick="event.stopPropagation();removeHabit('kill','${h.id}')">×</button>
+    </div>`).join("") : `<div class="sub">Add a habit to break.</div>`;
+}
+
+/* Quick-pick data — tap instead of type. Built for brainfog days. */
+const FEELING_CHIPS = ["anxious","angry","sad","ashamed","frustrated","numb","overwhelmed","hopeless","flat","tense","lonely","guilty"];
+const DM_WHO_CHIPS = ["Dad","Mom","Sibling","Friend","Coach","Teammate","Self"];
+
+/* Fill a target input with the chip label (append with comma if already has content) */
+function pickChip(targetId, value){
+  const el = document.getElementById(targetId); if(!el) return;
+  const cur = (el.value||"").trim();
+  if(!cur){ el.value = value; }
+  else if(cur.toLowerCase().split(/[,\s]+/).includes(value.toLowerCase())){ /* already there */ }
+  else { el.value = cur + (cur.endsWith(",") ? " " : ", ") + value; }
+  el.focus();
+}
+
+/* AAR templates — pre-fill 4 fields so you edit instead of compose */
+const AAR_TEMPLATES = {
+  strong: {
+    label: "Strong day",
+    plan:   "Hit the mission. PT, habits, mind work where needed.",
+    actual: "Executed the plan. Engine felt right. Stayed on task.",
+    gap:    "No significant gap — stayed in the lane I set.",
+    lesson: "Keep this shape. What made today work: "
+  },
+  flat: {
+    label: "Flat",
+    plan:   "",
+    actual: "Went through the motions. Not bad, not sharp.",
+    gap:    "Energy was low. Didn't fight it hard enough / didn't need to.",
+    lesson: "Sleep, food, or load may be off. Check: "
+  },
+  rough: {
+    label: "Rough",
+    plan:   "",
+    actual: "Fell short of what I wanted. ",
+    gap:    "What was me: . What was outside: .",
+    lesson: "Tomorrow I will "
+  },
+  carry: {
+    label: "Same as yesterday",
+    plan:   "__CARRY__", actual: "", gap: "", lesson: ""
+  }
+};
+
+function aarTemplate(key){
+  const t = AAR_TEMPLATES[key]; if(!t) return;
+  let plan = t.plan;
+  if(plan === "__CARRY__"){
+    // pull yesterday's plan
+    const keys = Object.keys(state.days).sort().reverse();
+    const prev = keys.find(k => k!==dk() && state.days[k].aar && state.days[k].aar.plan);
+    plan = prev ? state.days[prev].aar.plan : "";
+    if(!plan){ toast("No prior plan to carry"); return; }
+  }
+  const set = (id,v) => { const el = document.getElementById(id); if(el && v!==undefined) el.value = v; };
+  set("aarPlan", plan); set("aarActual", t.actual); set("aarGap", t.gap); set("aarLesson", t.lesson);
+  toast("Template loaded — edit to fit");
+}
+
+/* Emergency mode — one tap when spiking. Scroll to TIPP, switch to cyclic sighing, start. */
+function emergencyMode(){
+  go("mind");
+  // force cyclic sighing (more effective for calming than box)
+  if(typeof setBreath === "function") setBreath("sigh");
+  // start the breath timer
+  if(typeof startBreath === "function") startBreath();
+  // scroll to TIPP card (contains the acute-spike tools)
+  setTimeout(() => {
+    const tipp = [...document.querySelectorAll("#view-mind h2")].find(h => /TIPP/.test(h.textContent));
+    if(tipp) tipp.scrollIntoView({behavior:"smooth", block:"start"});
+  }, 100);
+  toast("Cold water. Then breathe. The tools are right here.");
+}
+
+function renderMind(){
+  document.getElementById("trDistortions").innerHTML = DISTORTIONS.map((d,i) =>
+    `<span class="chip" data-d="${i}" onclick="toggleChip(this)">${d.k}</span>`).join("");
+
+  /* Feeling chips — Thought Record + Check-the-Facts */
+  const feelingChipsHtml = FEELING_CHIPS.map(f => `<span class="chip" onclick="pickChip('trEmotion','${f}')">${f}</span>`).join("");
+  const tr = document.getElementById("trEmotionChips"); if(tr) tr.innerHTML = feelingChipsHtml;
+  const cfChipsHtml = FEELING_CHIPS.map(f => `<span class="chip" onclick="pickChip('cfEmotion','${f}')">${f}</span>`).join("");
+  const cf = document.getElementById("cfEmotionChips"); if(cf) cf.innerHTML = cfChipsHtml;
+
+  /* DEAR MAN Who chips */
+  const dmWho = document.getElementById("dmWhoChips");
+  if(dmWho) dmWho.innerHTML = DM_WHO_CHIPS.map(w => `<span class="chip" onclick="pickChip('dmWho','${w}')">${w}</span>`).join("");
+
+  document.getElementById("trHistory").innerHTML = state.tr.length ? state.tr.slice(-6).reverse().map(r => `
+    <div class="entry">
+      <div class="date">${new Date(r.t).toLocaleDateString()} · ${esc(r.emotion||"")} ${r.intA||0}→${r.intB||0}</div>
+      <div class="line"><b>Thought:</b> ${esc(r.thought||"—")}</div>
+      <div class="line"><b>Balanced:</b> ${esc(r.balanced||"—")}</div>
+      ${(r.distortions||[]).length ? `<div class="line" style="margin-top:6px">${r.distortions.map(i=>`<span class="chip" style="cursor:default">${DISTORTIONS[i]?.k||""}</span>`).join("")}</div>` : ""}
+    </div>`).join("") : `<div class="sub">No records yet.</div>`;
+
+  document.getElementById("dmHistory").innerHTML = state.dm.length ? state.dm.slice(-4).reverse().map(r => `
+    <div class="entry">
+      <div class="date">${new Date(r.t).toLocaleDateString()} · ${esc(r.who||"—")}</div>
+      <div class="line"><b>Describe:</b> ${esc(r.D||"—")}</div>
+      <div class="line"><b>Assert:</b> ${esc(r.A||"—")}</div>
+    </div>`).join("") : `<div class="sub">No plans saved yet.</div>`;
+}
+
+function renderAAR(){
+  const t = today();
+  ["aarPlan","aarActual","aarGap","aarLesson","aarG1","aarG2"].forEach(id => {
+    document.getElementById(id).value = t.aar[id.replace("aar","").toLowerCase()] || "";
+  });
+  /* Quick template row — tap to pre-fill, then edit */
+  const qr = document.getElementById("aarQuickRow");
+  if(qr){
+    qr.innerHTML = Object.entries(AAR_TEMPLATES).map(([k,v]) =>
+      `<button class="btn" onclick="aarTemplate('${k}')" style="font-size:11px;padding:6px 10px">${v.label}</button>`
+    ).join("");
+  }
+  const keys = Object.keys(state.days).sort().reverse().filter(k => k!==dk() && state.days[k].aar && state.days[k].aar.lesson);
+  document.getElementById("aarHistory").innerHTML = keys.length ? keys.slice(0,30).map(k => {
+    const d = state.days[k].aar;
+    const date = new Date(k).toLocaleDateString(undefined,{month:"short",day:"numeric"}).toUpperCase();
+    return `<div class="entry"><div class="date">${date} · LESSON</div><div class="line">${esc(d.lesson||"—")}</div></div>`;
+  }).join("") : `<div class="sub">No past reviews yet.</div>`;
+}
+
+function renderCreed(){
+  // Map stanza index -> CREED_MAP key (R,A,N,G,E,R)
+  const mapKeys = ["R1","A","N","G","E","R2"];
+  document.getElementById("creedFull").innerHTML = CREED.map((s,i) => {
+    const cm = CREED_MAP[mapKeys[i]];
+    const meaning = cm ? `<div class="sub" style="margin-top:6px;margin-left:42px;line-height:1.65;font-size:12px;border-left:2px solid var(--line);padding-left:10px">${cm.meaning}</div>` : "";
+    return `<div class="stanza" style="margin-bottom:14px"><span class="letter">${s.letter}</span><p>${s.text}</p>${meaning}</div>`;
+  }).join("");
+  document.getElementById("distortionsRef").innerHTML = DISTORTIONS.map(d => `
+    <details><summary><b>${d.k}</b></summary><div class="body">${d.d}</div></details>
+  `).join("");
+}
+
+
+/* =====================================================================
+   Coach Read \u2014 reads your data, writes plain observations
+   ===================================================================== */
+function coachRead(){
+  const out = [];
+  const today_ms = new Date().setHours(0,0,0,0);
+  const dayKey = ms => new Date(ms).toISOString().slice(0,10);
+
+  // Sleep, last 7 days
+  const sleeps = [];
+  for(let i=0;i<7;i++){
+    const r = (state.days[dayKey(today_ms - i*86400000)]||{}).recovery;
+    if(r && r.hours) sleeps.push(r.hours);
+  }
+  if(sleeps.length >= 3){
+    const avg = sleeps.reduce((a,b)=>a+b,0)/sleeps.length;
+    if(avg < 6.5) out.push({ s:"warn", t:`Sleep avg ${avg.toFixed(1)} hr / ${sleeps.length}d. Below 7-hr target. The engine is in compensation mode \u2014 expect higher RPE for the same load.` });
+    else if(avg >= 7.5) out.push({ s:"good", t:`Sleep avg ${avg.toFixed(1)} hr / ${sleeps.length}d. The engine has what it needs to repair.` });
+    else out.push({ s:"info", t:`Sleep avg ${avg.toFixed(1)} hr / ${sleeps.length}d. Workable. Push for 7.5+ when you can.` });
+  }
+
+  // RPE, last 5 days
+  const rpes = [];
+  for(let i=0;i<5;i++){
+    const r = (state.days[dayKey(today_ms - i*86400000)]||{}).recovery;
+    if(r && r.rpe) rpes.push(r.rpe);
+  }
+  if(rpes.length >= 3){
+    const avg = rpes.reduce((a,b)=>a+b,0)/rpes.length;
+    if(avg >= 8) out.push({ s:"warn", t:`Recent RPE avg ${avg.toFixed(1)}/10 across ${rpes.length} sessions. Sustained near-max. Build a deload day in this week.` });
+    else if(avg <= 4) out.push({ s:"info", t:`Recent RPE avg ${avg.toFixed(1)}/10. Easy week. Ready for a hard one if the calendar allows.` });
+  }
+
+  // PT plateau / progression per event
+  STANDARDS.forEach(std => {
+    const t = trendsFor(std.id);
+    if(t.sessionsAll >= 3 && t.bestAll){
+      const isReps = std.kind === "reps";
+      const better = (a,b) => isReps ? a > b : a < b;
+      if(t.best30 && t.best90 && t.best30 !== t.bestAll && !better(t.best30, t.best90)){
+        const fmt = v => isReps ? v : fmtTime(v);
+        out.push({ s:"warn", t:`${std.name}: 30d best ${fmt(t.best30)} vs 90d best ${fmt(t.best90)}. Plateau or fatigue \u2014 change the stimulus or back off load.` });
+      }
+    }
+  });
+
+  // AAR streak
+  let aarStreak = 0;
+  let dCursor = new Date();
+  for(let i=0;i<60;i++){
+    const k = dCursor.toISOString().slice(0,10);
+    const day = state.days[k];
+    if(day && day.aar && (day.aar.lesson||"").trim()) aarStreak++;
+    else if(i>0) break;
+    dCursor.setDate(dCursor.getDate()-1);
+  }
+  if(aarStreak >= 14) out.push({ s:"good", t:`AAR streak: ${aarStreak} days. Closing the day every day is the discipline most people skip.` });
+  else if(aarStreak >= 3) out.push({ s:"info", t:`AAR streak: ${aarStreak} days. Build it.` });
+  else if(Object.keys(state.days||{}).length >= 5 && aarStreak === 0) out.push({ s:"info", t:`No recent AAR. Even one honest line counts. Use a template if tired.` });
+
+  // Engine score
+  const score = engineScore();
+  if(score >= 80) out.push({ s:"good", t:`Engine score ${score}. Pulling the targets toward you. When all six clear 100, raise the bar.` });
+  else if(score >= 50) out.push({ s:"info", t:`Engine score ${score}. Past most floors; targets in sight. Keep grinding the gap.` });
+  else if(score > 0)   out.push({ s:"info", t:`Engine score ${score}. Early stage \u2014 the score climbs steadily once base is in.` });
+
+  if(out.length === 0) out.push({ s:"info", t:"Not enough data yet. Log a few sessions and the read will sharpen." });
+  return out;
+}
+
+function renderCoachRead(){
+  const el = document.getElementById("coachReadBox"); if(!el) return;
+  const all = coachRead();
+  const order = { warn:0, info:1, good:2 };
+  const sorted = all.slice().sort((a,b) => (order[a.s] ?? 9) - (order[b.s] ?? 9));
+  const reads = sorted.slice(0, 4);
+  const hidden = sorted.length - reads.length;
+  const colorOf = s => s==="warn" ? "var(--tan)" : s==="good" ? "#7faf66" : "var(--ink-dim)";
+  const tagOf = s => s==="warn" ? "FLAG" : s==="good" ? "GOOD" : "READ";
+  el.innerHTML = reads.map(r => `<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px;line-height:1.55">
+      <span style="font-family:var(--mono);font-size:10px;letter-spacing:.15em;color:${colorOf(r.s)};min-width:36px;padding-top:2px">${tagOf(r.s)}</span>
+      <span>${r.t}</span>
+    </div>`).join("") + (hidden > 0 ? `<div class="sub" style="font-size:11px;padding-top:6px;text-align:center">+${hidden} more reads available</div>` : "");
+}
+
+
+/* =====================================================================
+   Today's Session + Weekly Training Template
+   ===================================================================== */
+const WEEK_DAYS = [
+  { k:"sun", label:"Sunday",    short:"SUN" },
+  { k:"mon", label:"Monday",    short:"MON" },
+  { k:"tue", label:"Tuesday",   short:"TUE" },
+  { k:"wed", label:"Wednesday", short:"WED" },
+  { k:"thu", label:"Thursday",  short:"THU" },
+  { k:"fri", label:"Friday",    short:"FRI" },
+  { k:"sat", label:"Saturday",  short:"SAT" }
+];
+function todaysDayKey(){ return WEEK_DAYS[new Date().getDay()].k; }
+function todaysDayLabel(){ return WEEK_DAYS[new Date().getDay()].label.toUpperCase(); }
+function todaysWeekly(){ return (state.weekly && state.weekly[todaysDayKey()]) || ""; }
+function saveWeekly(){
+  state.weekly = state.weekly || {};
+  WEEK_DAYS.forEach(d => {
+    const el = document.getElementById("wk_"+d.k);
+    if(el) state.weekly[d.k] = el.value.trim();
+  });
+  save(); render(); toast("Weekly template saved");
+}
+function markSessionDone(){
+  const t = today();
+  t.sessionDone = !t.sessionDone;
+  save(); render();
+  toast(t.sessionDone ? "Session marked complete" : "Session unmarked");
+}
+
+function renderTodaySession(){
+  const text = todaysWeekly();
+  const t = today();
+  const done = !!t.sessionDone;
+  const cur = currentPhase();
+  const dayLbl = todaysDayLabel();
+
+  // BRIEF — top of page, action surface
+  const briefEl = document.getElementById("todaySessionBrief");
+  if(briefEl){
+    if(text){
+      briefEl.innerHTML = `
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--tan);margin-bottom:4px">TODAY \u00b7 ${dayLbl}</div>
+        <div style="font-size:16px;font-weight:600;margin-bottom:10px;line-height:1.45">${esc(text)}</div>
+        <button class="btn ${done?'primary':''} full upper" onclick="markSessionDone()">${done ? "\u2713 Session complete" : "Mark session complete"}</button>
+        <p class="sub" style="margin:8px 0 0;font-size:11px;line-height:1.5">Edit your weekly template in the <b>Long arc</b> card below.</p>`;
+    } else {
+      briefEl.innerHTML = `
+        <p class="sub" style="margin:0;line-height:1.6">No session set for ${dayLbl}. Open <b>Long arc</b> below to fill the weekly template \u2014 or write today\u2019s plan in <b>Today\u2019s Mission</b>.</p>`;
+    }
+  }
+
+  // PT — combined with phase emphasis
+  const ptEl = document.getElementById("ptTodaySession");
+  if(ptEl){
+    const sessionPart = text ?
+      `<div style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--tan);margin-bottom:4px">TODAY \u00b7 ${dayLbl}</div>
+       <div style="font-size:15px;font-weight:600;line-height:1.45;margin-bottom:8px">${esc(text)}</div>` :
+      `<div style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--tan);margin-bottom:4px">TODAY \u00b7 ${dayLbl}</div>
+       <p class="sub" style="margin:0 0 8px;font-size:13px">No session in the weekly template for today.</p>`;
+    ptEl.innerHTML = `${sessionPart}
+      <div style="height:1px;background:var(--line);margin:8px 0"></div>
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:.15em;color:var(--ink-dim);margin-bottom:4px">PHASE \u00b7 ${cur.label.toUpperCase()}</div>
+      <p style="margin:0;font-size:13px;line-height:1.55">${cur.emphasis||""}</p>`;
+  }
+}
+
+function renderWeeklyTemplate(){
+  const el = document.getElementById("weeklyEditor"); if(!el) return;
+  const w = state.weekly || {};
+  // order from Monday so the planning week starts where the body's training week starts
+  const ordered = ["mon","tue","wed","thu","fri","sat","sun"].map(k => WEEK_DAYS.find(d => d.k===k));
+  const placeholders = {
+    mon:"e.g. push-ups + 5-mile pace work",
+    tue:"e.g. strength (squat / press / pull)",
+    wed:"e.g. 2-mile run + accessories",
+    thu:"e.g. ruck 4\u20136 mi at load + mobility",
+    fri:"e.g. PT events full effort + run",
+    sat:"e.g. long ruck (8\u201312 mi at 47 lb)",
+    sun:"e.g. rest / mobility / reading"
+  };
+  el.innerHTML = `
+    <p class="sub" style="margin-top:0;margin-bottom:10px;font-size:12px;line-height:1.55">Set the shape of your training week. Today\u2019s line surfaces at the top of BRIEF and PT.</p>
+    ${ordered.map(d => `
+      <div class="field" style="margin-bottom:8px">
+        <label class="lbl">${d.short}</label>
+        <input id="wk_${d.k}" value="${esc(w[d.k]||"")}" placeholder="${placeholders[d.k]}">
+      </div>`).join("")}
+    <button class="btn primary full upper" onclick="saveWeekly()">Save weekly template</button>
+  `;
+}
+
+/* =====================================================================
+   Render — phase / recovery / trends
+   ===================================================================== */
+function renderPhase(){
+  const cur = currentPhase();
+  const status = document.getElementById("phaseStatus");
+  if(status){
+    const weekly = (cur.weekly||[]).map(line => `<li style="margin-bottom:4px">${line}</li>`).join("");
+    status.innerHTML = `<div style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--tan);margin-bottom:4px">CURRENT PHASE \u00b7 ${cur.duration||""}</div>
+      <div style="font-size:18px;font-weight:600;margin-bottom:4px">${cur.label}</div>
+      <p class="sub" style="margin:0 0 10px;line-height:1.6;font-size:13px">${cur.desc}</p>
+      ${cur.emphasis ? `<div style="font-size:13px;font-weight:600;color:var(--tan);margin-bottom:6px">Emphasis: <span style="color:var(--ink);font-weight:500">${cur.emphasis}</span></div>` : ""}
+      ${weekly ? `<div class="sub" style="font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-dim);margin-top:10px;margin-bottom:6px">What this looks like in practice (weekly)</div>
+        <ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.6;color:var(--ink-dim)">${weekly}</ul>` : ""}
+      ${cur.pitfalls ? `<div style="margin-top:10px;padding:8px 10px;background:rgba(196,168,107,.06);border-left:2px solid var(--tan);font-size:12px;line-height:1.55"><b style="color:var(--tan);font-size:10px;letter-spacing:.15em;text-transform:uppercase">Pitfalls</b><br>${cur.pitfalls}</div>` : ""}
+      <p class="sub" style="margin-top:10px;font-size:11px;line-height:1.5;font-style:italic">Scaffolding, not gospel. A qualified coach who has seen you move and knows your history will outperform any generic plan. (Bompa &amp; Haff 2018; MTI / Rob Shaul; ACSM)</p>`;
+  }
+  const chips = document.getElementById("phaseChips");
+  if(chips){
+    chips.innerHTML = Object.entries(PHASES).map(([k,p]) =>
+      `<span class="chip ${k===state.phase?'selected':''}" onclick="setPhase('${k}')" style="font-size:11px">${p.label}</span>`
+    ).join("");
+  }
+  const headerPhase = document.getElementById("headerPhase");
+  if(headerPhase) headerPhase.textContent = cur.label.toUpperCase();
+
+}
+
+function renderRecovery(){
+  const t = today();
+  const r = t.recovery || {};
+  const hrs = document.getElementById("recHours");      if(hrs) hrs.value = r.hours || "";
+  if(r.rpe !== undefined && r.rpe !== null) selectRecChip("recRpeChips", r.rpe);
+  if(r.quality)  selectRecChip("recQualityChips", r.quality);
+  if(r.soreness) selectRecChip("recSorenessChips", r.soreness);
+
+  const wk = document.getElementById("recoveryWeek");
+  if(wk){
+    const today_ms = new Date().setHours(0,0,0,0);
+    const days = [];
+    for(let i=6;i>=0;i--){
+      const d = new Date(today_ms - i*86400000);
+      const k = d.toISOString().slice(0,10);
+      const dr = (state.days[k]||{}).recovery || {};
+      days.push({ k, hours:dr.hours||0, rpe:dr.rpe||0, label: d.toLocaleDateString(undefined,{weekday:"narrow"}) });
+    }
+    const slept = days.filter(x=>x.hours>0);
+    const avg = slept.length ? (slept.reduce((a,b)=>a+b.hours,0)/slept.length).toFixed(1) : "—";
+    wk.innerHTML = `
+      <div class="sub" style="font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--tan);margin-bottom:6px">7-DAY · sleep avg ${avg} hr</div>
+      <div style="display:flex;gap:4px;align-items:flex-end;height:42px">
+        ${days.map(x => {
+          const h = x.hours ? Math.min(100, (x.hours/9)*100) : 4;
+          const bg = x.hours ? "var(--tan)" : "var(--line)";
+          return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;height:100%;justify-content:flex-end">
+            <div style="width:100%;height:${h}%;background:${bg};opacity:${x.hours?0.7:0.3}"></div>
+            <div class="sub" style="font-size:9px;font-family:var(--mono)">${x.label}</div>
+          </div>`;
+        }).join("")}
+      </div>`;
+  }
+}
+
+function renderTrends(){
+  const box = document.getElementById("trendsBox"); if(!box) return;
+  const fmt = (s, v) => !v ? "—" : (s.kind === "reps" ? String(v) : fmtTime(v));
+  box.innerHTML = STANDARDS.map(s => {
+    const t = trendsFor(s.id);
+    const since = t.firstDate ? `since ${new Date(t.firstDate).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"2-digit"})}` : "no sessions yet";
+    return `<div style="padding:8px 0;border-bottom:1px solid var(--line)">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <b style="font-size:13px">${s.name}</b>
+        <span class="sub" style="font-size:11px">${since}</span>
+      </div>
+      <div style="display:flex;gap:14px;margin-top:6px;font-size:12px;font-family:var(--mono);color:var(--ink-dim);flex-wrap:wrap">
+        <span><b style="color:var(--ink)">${fmt(s, t.best30)}</b> 30d <span class="sub">(${t.sessions30})</span></span>
+        <span><b style="color:var(--ink)">${fmt(s, t.best90)}</b> 90d <span class="sub">(${t.sessions90})</span></span>
+        <span><b style="color:var(--tan)">${fmt(s, t.bestAll)}</b> all-time <span class="sub">(${t.sessionsAll})</span></span>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+/* =====================================================================
+   Actions
+   ===================================================================== */
+function saveMission(){
+  const t = today();
+  t.mission.primary = v("missionPrimary");
+  t.mission.s1 = v("missionS1"); t.mission.s2 = v("missionS2"); t.mission.s3 = v("missionS3");
+  t.mission.why = v("missionWhy"); t.mission.t = Date.now();
+  save(); toast("Brief locked");
+}
+function togglePlease(id){ const t=today(); t.please[id]=!t.please[id]; save(); renderBrief(); }
+
+function toggleHabit(kind, id){
+  const t = today();
+  t.habits[kind][id] = !t.habits[kind][id];
+  const h = state[kind].find(x => x.id===id); if(!h) { save(); return; }
+  let d = new Date(), s = 0;
+  while(true){
+    const k = d.toISOString().slice(0,10);
+    if(state.days[k] && state.days[k].habits && state.days[k].habits[kind] && state.days[k].habits[kind][id]) { s++; d.setDate(d.getDate()-1); } else break;
+  }
+  h.streak = s;
+  save(); renderBrief(); renderLedger();
+}
+function addHabit(kind){
+  const field = kind==="build" ? "newBuild" : "newKill";
+  const val = v(field); if(!val) return;
+  state[kind].push({ id: kind+"_"+Date.now().toString(36), label: val, streak: 0 });
+  document.getElementById(field).value = "";
+  save(); renderBrief(); renderLedger();
+}
+function removeHabit(kind, id){
+  if(!confirm("Remove this habit?")) return;
+  state[kind] = state[kind].filter(h => h.id !== id);
+  save(); renderBrief(); renderLedger();
+}
+
+function savePT(){
+  const t = today();
+  for(const s of STANDARDS){
+    const raw = v("log_"+s.id);
+    if(!raw){ delete t.pt[s.id]; continue; }
+    const val = s.kind==="reps" ? Number(raw)||0 : toSec(raw);
+    t.pt[s.id] = val;
+    if(s.kind==="reps"){ if(val > (state.bests[s.id]||0)) state.bests[s.id] = val; }
+    else { if(val > 0 && (!state.bests[s.id] || val < state.bests[s.id])) state.bests[s.id] = val; }
+  }
+  save(); renderPT(); renderBrief(); toast("PT committed");
+}
+
+/* CBT Thought Record */
+function toggleChip(el){ el.classList.toggle("selected"); }
+function saveTR(){
+  const chips = [...document.querySelectorAll("#trDistortions .chip.selected")].map(c => Number(c.dataset.d));
+  const intAChip = document.querySelector('#trIntAChips .chip.selected');
+  const intBChip = document.querySelector('#trIntBChips .chip.selected');
+  const rec = {
+    t: Date.now(),
+    sit: v("trSit"), emotion: v("trEmotion"),
+    intA: intAChip ? Number(intAChip.dataset.val) : 50,
+    thought: v("trThought"), distortions: chips,
+    evFor: v("trFor"), evAgainst: v("trAgainst"),
+    balanced: v("trBalanced"),
+    intB: intBChip ? Number(intBChip.dataset.val) : 50
+  };
+  state.tr.push(rec); save();
+  ["trSit","trEmotion","trThought","trFor","trAgainst","trBalanced"].forEach(id => document.getElementById(id).value = "");
+  // reset both intensity chip pickers back to 50
+  selectRecChip("trIntAChips", 50);
+  selectRecChip("trIntBChips", 50);
+  document.querySelectorAll("#trDistortions .chip.selected").forEach(c => c.classList.remove("selected"));
+  renderMind(); toast("Record saved");
+}
+
+/* DBT Check the Facts -> Opposite Action */
+function cfVerdict(kind){
+  const wrap = document.getElementById("cfOppWrap");
+  const hint = document.getElementById("cfVerdictHint");
+  if(kind === "fits"){
+    wrap.style.display = "none";
+    hint.textContent = "Emotion fits the facts. Problem-solve the situation itself, or tolerate until you can.";
+  } else {
+    wrap.style.display = "block";
+    hint.textContent = "Emotion doesn't fit. Act opposite — fully, not halfway.";
+  }
+  hint.dataset.kind = kind;
+}
+function saveCF(){
+  const rec = {
+    t: Date.now(),
+    emotion: v("cfEmotion"), event: v("cfEvent"),
+    interp: v("cfInterp"), threat: v("cfThreat"),
+    verdict: document.getElementById("cfVerdictHint").dataset.kind || "",
+    urge: v("cfUrge"), opposite: v("cfOpposite")
+  };
+  state.cf.push(rec); save();
+  ["cfEmotion","cfEvent","cfInterp","cfThreat","cfUrge","cfOpposite"].forEach(id => document.getElementById(id).value = "");
+  document.getElementById("cfOppWrap").style.display = "none";
+  document.getElementById("cfVerdictHint").textContent = "";
+  toast("Saved");
+}
+
+/* DEAR MAN planner */
+function saveDM(){
+  const rec = { t: Date.now(), who: v("dmWho"), D: v("dmD"), E: v("dmE"), A: v("dmA"), R: v("dmR") };
+  state.dm.push(rec); save();
+  ["dmWho","dmD","dmE","dmA","dmR"].forEach(id => document.getElementById(id).value = "");
+  renderMind(); toast("Plan saved");
+}
+
+/* AAR */
+
+function saveAAR(){
+  const t = today();
+  t.aar.plan   = v("aarPlan");
+  t.aar.actual = v("aarActual");
+  t.aar.gap    = v("aarGap");
+  t.aar.lesson = v("aarLesson");
+  t.aar.g1     = v("aarG1");
+  t.aar.g2     = v("aarG2");
+  t.aar.t = Date.now();
+  save(); renderAAR(); toast("Day closed");
+}
+
+/* =====================================================================
+   Breathing engine — box breathing + cyclic sighing
+   ===================================================================== */
+let breathMode = "box";
+const MODES = {
+  box:  { phases:["Inhale","Hold","Exhale","Hold"], lengths:[4,4,4,4], duration:300,
+          desc:"Box: 4 in, 4 hold, 4 out, 4 hold. Neutral focus. Used in SEAL training; popularized by Mark Divine." },
+  sigh: { phases:["Inhale","Top-up","Exhale"],      lengths:[3,1,6],   duration:300,
+          desc:"Cyclic sigh: short inhale through nose, small top-up, long exhale through mouth. Most effective daily calming protocol (Stanford 2023)." }
+};
+function setBreath(m){
+  breathMode = m;
+  const desc = document.getElementById("breathDesc"); if(desc) desc.textContent = MODES[m].desc;
+  const mb = document.getElementById("modeBox");  if(mb) mb.classList.toggle("primary", m==="box");
+  const ms = document.getElementById("modeSigh"); if(ms) ms.classList.toggle("primary", m==="sigh");
+}
+
+let breathTimer=null, breathT0=0, breathPhase=0, breathPhaseStart=0, breathCycleCount=0;
+function startBreath(){
+  stopBreath();
+  breathT0 = Date.now(); breathPhase = 0; breathPhaseStart = breathT0; breathCycleCount = 0;
+  const btn = document.getElementById("breathStart"); if(btn) btn.textContent = "Running…";
+  const cy = document.getElementById("breathCycle"); if(cy) cy.textContent = "0";
+  tickBreath(); updatePulse();
+  breathTimer = setInterval(tickBreath, 100);
+}
+function stopBreath(){
+  if(breathTimer){ clearInterval(breathTimer); breathTimer=null; }
+  const btn = document.getElementById("breathStart"); if(btn) btn.textContent = "Start · 5 min";
+  const ph  = document.getElementById("breathPhase"); if(ph)  ph.textContent = "Ready";
+  const ct  = document.getElementById("breathCount"); if(ct)  ct.textContent = "—";
+  const p = document.getElementById("pulse");
+  if(p){ p.style.transition = "none"; p.style.transform = "scale(0.3)"; }
+  const cy = document.getElementById("breathCycle"); if(cy) cy.textContent = "0";
+  const tt = document.getElementById("breathTotal"); if(tt) tt.textContent = "5:00";
+}
+function tickBreath(){
+  const M = MODES[breathMode];
+  const now = Date.now();
+  const total = (now - breathT0) / 1000;
+  if(total >= M.duration){ stopBreath(); toast("Round complete"); return; }
+  const phaseLen = M.lengths[breathPhase];
+  const inPhase = (now - breathPhaseStart) / 1000;
+  if(inPhase >= phaseLen){
+    const wasLast = breathPhase === M.phases.length - 1;
+    breathPhase = (breathPhase + 1) % M.phases.length;
+    breathPhaseStart = now;
+    if(wasLast){
+      breathCycleCount++;
+      const cy = document.getElementById("breathCycle"); if(cy) cy.textContent = String(breathCycleCount);
+    }
+    updatePulse();
+  }
+  const ph = document.getElementById("breathPhase"); if(ph) ph.textContent = M.phases[breathPhase];
+  const ct = document.getElementById("breathCount");
+  if(ct){ const remain = Math.max(0, Math.ceil(M.lengths[breathPhase] - (Date.now() - breathPhaseStart)/1000)); ct.textContent = remain + "s"; }
+  const tt = document.getElementById("breathTotal");
+  if(tt){ const rem = Math.max(0, Math.ceil(M.duration - total)); tt.textContent = Math.floor(rem/60) + ":" + String(rem%60).padStart(2,"0"); }
+}
+function updatePulse(){
+  const M = MODES[breathMode];
+  const p = document.getElementById("pulse"); if(!p) return;
+  const phase = M.phases[breathPhase];
+  const len = M.lengths[breathPhase];
+  p.style.transition = `transform ${len}s ease-in-out`;
+  if(phase === "Inhale"){ p.style.transform = "scale(1)"; }
+  else if(phase === "Top-up"){ p.style.transform = "scale(1.05)"; }
+  else if(phase === "Exhale"){ p.style.transform = "scale(0.3)"; }
+  // Hold phases: leave the scale where it was
+}
+
+/* =====================================================================
+   Navigation · helpers · boot
+   ===================================================================== */
+function go(tab){
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  const el = document.getElementById("view-"+tab); if(el) el.classList.add("active");
+  document.querySelectorAll("nav.tabs button").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
+  window.scrollTo(0,0);
+}
+function v(id){ const el = document.getElementById(id); return el ? (el.value||"").trim() : ""; }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+let toastTm=null;
+function toast(msg, ms){
+  const el = document.getElementById("toast"); if(!el) return;
+  el.textContent = msg; el.classList.add("show");
+  clearTimeout(toastTm); toastTm = setTimeout(() => el.classList.remove("show"), ms || 1800);
+}
+
+function boot(){
+  document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => go(b.dataset.tab)));
+  render();
+  setBreath("box");
+  const h = new Date().getHours();
+  go(h >= 19 ? "aar" : "brief");
+  if("serviceWorker" in navigator && location.protocol !== "file:"){
+    navigator.serviceWorker.register("./sw.js").catch(()=>{});
+  }
+}
+
+if(document.readyState === "loading"){
+  document.addEventListener("DOMContentLoaded", boot);
+} else {
+  boot();
+}
+</script>
+</body>
+</html>
