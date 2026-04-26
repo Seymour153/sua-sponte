@@ -2035,22 +2035,30 @@ function toast(msg, ms){
   clearTimeout(toastTm); toastTm = setTimeout(() => el.classList.remove("show"), ms || 1800);
 }
 
-/* iOS Safari fix: keyboard dismiss leaves fixed-position elements stranded. */
+/* iOS Safari fix: hide bottom nav while keyboard is up; restore on dismiss.
+   Uses Visual Viewport API to detect keyboard state via height delta. */
 function installKeyboardFix(){
+  const vv = window.visualViewport;
+  if(!vv) return;
+  const navEl = () => document.querySelector("nav.tabs");
+  function update(){
+    const n = navEl(); if(!n) return;
+    const diff = window.innerHeight - vv.height;
+    // If visualViewport shrank by more than 150px, the keyboard is up
+    if(diff > 150){
+      n.style.display = "none";
+    } else {
+      n.style.display = "";
+      n.style.transform = "translate3d(0,0,0)";
+    }
+  }
+  vv.addEventListener("resize", update);
+  vv.addEventListener("scroll", update);
   document.addEventListener("focusout", e => {
     const t = e.target;
     if(!t || (t.tagName !== "INPUT" && t.tagName !== "TEXTAREA")) return;
-    setTimeout(() => {
-      window.scrollTo(window.scrollX, Math.max(0, window.scrollY - 1));
-      window.scrollTo(window.scrollX, window.scrollY + 1);
-    }, 80);
+    setTimeout(update, 120);
   }, true);
-  if(window.visualViewport){
-    window.visualViewport.addEventListener("resize", () => {
-      const nav = document.querySelector("nav.tabs");
-      if(nav){ nav.style.transform = "translate3d(0,0,0)"; }
-    });
-  }
 }
 
 function boot(){
@@ -2065,7 +2073,6 @@ function boot(){
     navigator.serviceWorker.register("./sw.js").catch(()=>{});
   }
 }
-
 if(document.readyState === "loading"){
   document.addEventListener("DOMContentLoaded", boot);
 } else {
@@ -2074,4 +2081,3 @@ if(document.readyState === "loading"){
 </script>
 </body>
 </html>
-                                 
