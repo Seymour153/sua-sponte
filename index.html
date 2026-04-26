@@ -227,7 +227,13 @@
   .breath-meta{margin-top:14px;font-family:var(--mono);font-size:11px;color:var(--ink-dim);text-align:center;letter-spacing:.12em;display:flex;gap:14px;justify-content:center;align-items:baseline}
   .breath-meta b{color:var(--ink);font-weight:600}
 
-  /* ---------- CHIPS ---------- */
+    /* ---------- COLLAPSIBLE CARDS ---------- */
+  .card.collapsible h2{cursor:pointer;user-select:none;position:relative;padding-right:28px;margin:0}
+  .card.collapsible h2::after{content:"\2212";position:absolute;right:2px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:20px;color:var(--ink-dim);font-weight:400}
+  .card.collapsible.collapsed h2::after{content:"+"}
+  .card.collapsible.collapsed .collapsible-body{display:none}
+
+/* ---------- CHIPS ---------- */
   .chip{display:inline-block;padding:4px 9px;border:1px solid var(--line-2);border-radius:3px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--ink-dim);margin-right:4px;margin-bottom:4px;background:var(--bg-2);cursor:pointer;user-select:none;text-transform:uppercase}
   .chip.selected{border-color:var(--tan);color:var(--tan);background:rgba(196,168,107,.1)}
 
