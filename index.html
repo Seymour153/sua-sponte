@@ -401,6 +401,12 @@
       <h3 style="font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--tan);margin-bottom:8px">Weekly training template</h3>
       <div id="weeklyEditor"></div>
       <div class="divider"></div>
+      <h3 style="font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--tan);margin-bottom:8px">Sequencing rules · when in the day</h3>
+      <p class="sub" style="font-size:12px;line-height:1.6;margin:0 0 8px"><b style="color:var(--tan)">AM</b> for the priority bottleneck (right now: running). Hard sessions at dawn — cortisol/T peak.</p>
+      <p class="sub" style="font-size:12px;line-height:1.6;margin:0 0 8px"><b style="color:var(--tan)">PM (4–7)</b> for hypertrophy lifts. Peak strength output and the protein-synthesis window line up.</p>
+      <p class="sub" style="font-size:12px;line-height:1.6;margin:0 0 8px"><b style="color:var(--tan)">≥4 hr</b> between AM and PM sessions; 6+ better. CNS reset.</p>
+      <p class="sub" style="font-size:12px;line-height:1.6;margin:0 0 12px"><b style="color:var(--tan)">No two hard sessions same day.</b> Mon push is moderate. Wed intervals are hard but it&rsquo;s a single-session day.</p>
+      <div class="divider"></div>
       <h3 style="font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--tan);margin-bottom:8px">Backup · portability</h3>
       <p class="sub" style="margin-top:0;margin-bottom:10px;font-size:12px">Local-storage data lives only on this device. Export periodically. Import to restore on a new device.</p>
       <div class="grid2" style="gap:8px">
@@ -418,10 +424,6 @@
     <div class="banner">
       <h2>The Engine</h2>
       <p>Targets are hard goals, not entry floors. Minimums get men into Ranger School. Targets build the man who finishes it.</p>
-    </div>
-
-    <div class="card" style="border-left:3px solid var(--tan)">
-      <div id="ptTodaySession"></div>
     </div>
 
     <div class="card">
@@ -903,13 +905,13 @@ const DEFAULTS = {
   startDate: dk(),
   phase: "base",
   weekly: {
-    mon: "PUSH day in APEX (bench/OHP/triceps) + easy 2-3 mi run",
-    tue: "Bike 45-60 min easy + core",
-    wed: "Run intervals OR 3 mi tempo (alternate weeks)",
-    thu: "PULL day in APEX (rows/pull-ups/biceps) + chin-up max set",
-    fri: "Steady 3-4 mi run + mobility",
-    sat: "Ruck 4-5 mi at 30 lb OR long bike 60-90 min",
-    sun: "Rest"
+    mon: "AM: easy 2-3 mi run conversational  ·  PM: PUSH in APEX",
+    tue: "PM: bike 45-60 min easy + core",
+    wed: "AM: run intervals OR 3 mi tempo (the hard run)",
+    thu: "PM: PULL in APEX + chin-up max set",
+    fri: "AM: steady 3-4 mi run + mobility",
+    sat: "AM: ruck 4-5 mi at 30 lb OR long bike 60-90 min",
+    sun: "Rest (walk if restless)"
   },
   days: {},
   build: [
@@ -1668,19 +1670,6 @@ function renderTodaySession(){
     }
   }
 
-  // PT — combined with phase emphasis
-  const ptEl = document.getElementById("ptTodaySession");
-  if(ptEl){
-    const sessionPart = text ?
-      `<div style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--tan);margin-bottom:4px">TODAY \u00b7 ${dayLbl}</div>
-       <div style="font-size:15px;font-weight:600;line-height:1.45;margin-bottom:8px">${esc(text)}</div>` :
-      `<div style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--tan);margin-bottom:4px">TODAY \u00b7 ${dayLbl}</div>
-       <p class="sub" style="margin:0 0 8px;font-size:13px">No session in the weekly template for today.</p>`;
-    ptEl.innerHTML = `${sessionPart}
-      <div style="height:1px;background:var(--line);margin:8px 0"></div>
-      <div style="font-family:var(--mono);font-size:10px;letter-spacing:.15em;color:var(--ink-dim);margin-bottom:4px">PHASE \u00b7 ${cur.label.toUpperCase()}</div>
-      <p style="margin:0;font-size:13px;line-height:1.55">${cur.emphasis||""}</p>`;
-  }
 }
 
 function renderWeeklyTemplate(){
@@ -2029,8 +2018,7 @@ function toast(msg, ms){
   clearTimeout(toastTm); toastTm = setTimeout(() => el.classList.remove("show"), ms || 1800);
 }
 
-/* iOS Safari fix: keyboard dismiss leaves fixed-position elements stranded.
-   Force a reflow when any input loses focus so the bottom nav snaps back. */
+/* iOS Safari fix: keyboard dismiss leaves fixed-position elements stranded. */
 function installKeyboardFix(){
   document.addEventListener("focusout", e => {
     const t = e.target;
@@ -2047,9 +2035,10 @@ function installKeyboardFix(){
     });
   }
 }
+
 function boot(){
-  installKeyboardFix();
   document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => go(b.dataset.tab)));
+  installKeyboardFix();
   render();
   setBreath("box");
   const h = new Date().getHours();
@@ -2058,7 +2047,6 @@ function boot(){
     navigator.serviceWorker.register("./sw.js").catch(()=>{});
   }
 }
-
 if(document.readyState === "loading"){
   document.addEventListener("DOMContentLoaded", boot);
 } else {
