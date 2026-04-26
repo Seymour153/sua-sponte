@@ -83,6 +83,33 @@
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
   @media (max-width:440px){.grid3{grid-template-columns:1fr 1fr}}
+/* ---------- MOBILE FIXES ---------- */
+  @media (max-width: 480px) {
+    .card{padding:12px}
+    .banner h2{font-size:18px}
+    .banner p{font-size:12px}
+    .ranger-score{flex-direction:column;align-items:flex-start;gap:10px}
+    .ranger-score .score-copy{font-size:12px;line-height:1.5}
+    .ring{width:200px;height:200px}
+    .ring .count{font-size:38px}
+    .grid2{grid-template-columns:1fr;gap:8px}
+    .breath-meta{flex-wrap:wrap;gap:8px}
+    .chip{font-size:9px;padding:5px 8px}
+    nav.tabs button{font-size:9px}
+    .field input,.field textarea{font-size:14px}
+    .intensity{flex-wrap:wrap}
+    .intensity .lab{min-width:0}
+    .intensity .val{min-width:0}
+    .breath-wrap{padding:8px 0}
+    .topbar{padding:8px 12px}
+    .topbar .d{font-size:9px}
+    h2{font-size:15px}
+    .stat .v{font-size:18px}
+  }
+  @media (max-width: 360px) {
+    .ring{width:170px;height:170px}
+    .ring .count{font-size:32px}
+  }
   .spacer{height:10px}
   .divider{height:1px;background:var(--line);margin:14px 0}
 
@@ -103,6 +130,7 @@
   /* ---------- TABS ---------- */
   nav.tabs{
     position:fixed;left:0;right:0;bottom:0;z-index:30;
+    transform:translate3d(0,0,0);will-change:transform;
     background:rgba(11,13,11,.96);
     border-top:1px solid var(--line);
     backdrop-filter:blur(12px);
@@ -1944,7 +1972,26 @@ function toast(msg, ms){
   clearTimeout(toastTm); toastTm = setTimeout(() => el.classList.remove("show"), ms || 1800);
 }
 
+/* iOS Safari fix: keyboard dismiss leaves fixed-position elements stranded.
+   Force a reflow when any input loses focus so the bottom nav snaps back. */
+function installKeyboardFix(){
+  document.addEventListener("focusout", e => {
+    const t = e.target;
+    if(!t || (t.tagName !== "INPUT" && t.tagName !== "TEXTAREA")) return;
+    setTimeout(() => {
+      window.scrollTo(window.scrollX, Math.max(0, window.scrollY - 1));
+      window.scrollTo(window.scrollX, window.scrollY + 1);
+    }, 80);
+  }, true);
+  if(window.visualViewport){
+    window.visualViewport.addEventListener("resize", () => {
+      const nav = document.querySelector("nav.tabs");
+      if(nav){ nav.style.transform = "translate3d(0,0,0)"; }
+    });
+  }
+}
 function boot(){
+  installKeyboardFix();
   document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => go(b.dataset.tab)));
   render();
   setBreath("box");
