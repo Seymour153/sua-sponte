@@ -909,13 +909,13 @@ const DEFAULTS = {
   startDate: dk(),
   phase: "base",
   weekly: {
-    mon: "AM: easy 2-3 mi run conversational  ·  PM: PUSH in APEX",
-    tue: "AM: rest / mobility  ·  PM: bike 45-60 min easy + core",
-    wed: "AM: run intervals OR 3 mi tempo  ·  PM: rest",
-    thu: "AM: rest / light mobility  ·  PM: PULL in APEX + chin-up max set",
-    fri: "AM: steady 3-4 mi run + mobility  ·  PM: rest",
-    sat: "AM: ruck 4-5 mi at 30 lb OR long bike 60-90 min  ·  PM: rest",
-    sun: "AM: rest (walk if restless)  ·  PM: rest"
+    mon: { am: "easy 2-3 mi run conversational",       pm: "PUSH in APEX" },
+    tue: { am: "rest / mobility",                       pm: "bike 45-60 min easy + core" },
+    wed: { am: "run intervals OR 3 mi tempo",           pm: "rest" },
+    thu: { am: "rest / light mobility",                 pm: "PULL in APEX + chin-up max set" },
+    fri: { am: "steady 3-4 mi run + mobility",          pm: "rest" },
+    sat: { am: "ruck 4-5 mi at 30 lb OR long bike 60-90 min", pm: "rest" },
+    sun: { am: "rest (walk if restless)",               pm: "rest" }
   },
   days: {},
   build: [
@@ -1636,14 +1636,38 @@ const WEEK_DAYS = [
 ];
 function todaysDayKey(){ return WEEK_DAYS[new Date().getDay()].k; }
 function todaysDayLabel(){ return WEEK_DAYS[new Date().getDay()].label.toUpperCase(); }
-function todaysWeekly(){ return (state.weekly && state.weekly[todaysDayKey()]) || ""; }
+function todaysWeekly(){
+  const v = state.weekly && state.weekly[todaysDayKey()];
+  if(!v) return { am:"", pm:"" };
+  if(typeof v === "string") return { am: v, pm: "" };
+  return { am: v.am||"", pm: v.pm||"" };
+}
 function saveWeekly(){
   state.weekly = state.weekly || {};
   WEEK_DAYS.forEach(d => {
-    const el = document.getElementById("wk_"+d.k);
-    if(el) state.weekly[d.k] = el.value.trim();
+    const am = document.getElementById("wk_"+d.k+"_am");
+    const pm = document.getElementById("wk_"+d.k+"_pm");
+    state.weekly[d.k] = {
+      am: am ? am.value.trim() : "",
+      pm: pm ? pm.value.trim() : ""
+    };
   });
   save(); render(); toast("Weekly template saved");
+}
+function migrateWeeklyToObjectFormat(){
+  if(!state.weekly){ state.weekly = {}; return; }
+  WEEK_DAYS.forEach(d => {
+    const v = state.weekly[d.k];
+    if(typeof v === "string"){
+      const amM = v.match(/AM:\s*([\s\S]+?)(?=\s+\xb7\s+PM:|$)/i);
+      const pmM = v.match(/PM:\s*([\s\S]+)$/i);
+      const am = amM ? amM[1].trim() : "";
+      const pm = pmM ? pmM[1].trim() : "";
+      state.weekly[d.k] = (am || pm) ? { am, pm } : { am: v.trim(), pm: "" };
+    } else if(!v || typeof v !== "object"){
+      state.weekly[d.k] = { am:"", pm:"" };
+    }
+  });
 }
 function resetWeekly(){
   if(!confirm("Reset weekly template to the comeback defaults? Your saved entries for each day will be replaced.")) return;
@@ -1659,55 +1683,29 @@ function markSessionDone(){
 }
 
 function renderTodaySession(){
-  const text = todaysWeekly();
+  const session = todaysWeekly();
   const t = today();
   const done = !!t.sessionDone;
-  const cur = currentPhase();
   const dayLbl = todaysDayLabel();
-
-  // BRIEF — top of page, action surface
-  const briefEl = document.getElementById("todaySessionBrief");
-  if(briefEl){
-    if(text){
-      briefEl.innerHTML = `
-        <div style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--tan);margin-bottom:4px">TODAY \u00b7 ${dayLbl}</div>
-        <div style="font-size:16px;font-weight:600;margin-bottom:10px;line-height:1.45">${esc(text)}</div>
-        <button class="btn ${done?'primary':''} full upper" onclick="markSessionDone()">${done ? "\u2713 Session complete" : "Mark session complete"}</button>
-        <p class="sub" style="margin:8px 0 0;font-size:11px;line-height:1.5">Edit your weekly template in the <b>Long arc</b> card below.</p>`;
-    } else {
-      briefEl.innerHTML = `
-        <p class="sub" style="margin:0;line-height:1.6">No session set for ${dayLbl}. Open <b>Long arc</b> below to fill the weekly template \u2014 or write today\u2019s plan in <b>Today\u2019s Mission</b>.</p>`;
-    }
+  const briefEl = document.getElementById("todaySessionBrief"); if(!briefEl) return;
+  const slot = (label, text) => text
+    ? `<div style="display:flex;gap:10px;margin-bottom:6px;padding:6px 0;border-bottom:1px solid var(--line)"><span style="font-family:var(--mono);font-size:11px;color:var(--tan);letter-spacing:.18em;min-width:28px;padding-top:2px">${label}</span><span style="font-size:15px;font-weight:600;line-height:1.45;flex:1">${esc(text)}</span></div>`
+    : "";
+  if(session.am || session.pm){
+    briefEl.innerHTML = `<div style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--tan);margin-bottom:8px">TODAY \u00b7 ${dayLbl}</div>${slot("AM", session.am)}${slot("PM", session.pm)}<button class="btn ${done?'primary':''} full upper" onclick="markSessionDone()" style="margin-top:8px">${done ? "\u2713 Session complete" : "Mark session complete"}</button><p class="sub" style="margin:8px 0 0;font-size:11px;line-height:1.5">Edit your weekly template in the <b>Long arc</b> card below.</p>`;
+  } else {
+    briefEl.innerHTML = `<p class="sub" style="margin:0;line-height:1.6">No session set for ${dayLbl}. Open <b>Long arc</b> to fill the weekly template, or tap <b>Reset to defaults</b>.</p>`;
   }
-
 }
 
 function renderWeeklyTemplate(){
   const el = document.getElementById("weeklyEditor"); if(!el) return;
   const w = state.weekly || {};
-  // order from Monday so the planning week starts where the body's training week starts
   const ordered = ["mon","tue","wed","thu","fri","sat","sun"].map(k => WEEK_DAYS.find(d => d.k===k));
-  const placeholders = {
-    mon:"e.g. push-ups + 5-mile pace work",
-    tue:"e.g. strength (squat / press / pull)",
-    wed:"e.g. 2-mile run + accessories",
-    thu:"e.g. ruck 4\u20136 mi at load + mobility",
-    fri:"e.g. PT events full effort + run",
-    sat:"e.g. long ruck (8\u201312 mi at 47 lb)",
-    sun:"e.g. rest / mobility / reading"
-  };
-  el.innerHTML = `
-    <p class="sub" style="margin-top:0;margin-bottom:10px;font-size:12px;line-height:1.55">Set the shape of your training week. Today\u2019s line surfaces at the top of BRIEF and PT.</p>
-    ${ordered.map(d => `
-      <div class="field" style="margin-bottom:8px">
-        <label class="lbl">${d.short}</label>
-        <input id="wk_${d.k}" value="${esc(w[d.k]||"")}" placeholder="${placeholders[d.k]}">
-      </div>`).join("")}
-    <div class="grid2" style="gap:8px">
-      <button class="btn primary full upper" onclick="saveWeekly()">Save</button>
-      <button class="btn full upper" onclick="resetWeekly()" style="font-size:11px">Reset to defaults</button>
-    </div>
-  `;
+  el.innerHTML = `<p class="sub" style="margin-top:0;margin-bottom:10px;font-size:12px;line-height:1.55">Set the shape of each day. AM and PM separate. Use \u201Crest\u201D when there is no session.</p>` + ordered.map(d => {
+    const day = (w[d.k] && typeof w[d.k]==='object') ? w[d.k] : { am:"", pm:"" };
+    return `<div style="margin-bottom:10px;padding:10px;border:1px solid var(--line);border-radius:4px;background:var(--bg-2)"><div style="font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--tan);margin-bottom:8px">${d.short}</div><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-family:var(--mono);font-size:10px;color:var(--ink-dim);min-width:28px">AM</span><input id="wk_${d.k}_am" value="${esc(day.am||"")}" placeholder="rest" style="flex:1"></div><div style="display:flex;align-items:center;gap:8px"><span style="font-family:var(--mono);font-size:10px;color:var(--ink-dim);min-width:28px">PM</span><input id="wk_${d.k}_pm" value="${esc(day.pm||"")}" placeholder="rest" style="flex:1"></div></div>`;
+  }).join("") + `<div class="grid2" style="gap:8px"><button class="btn primary full upper" onclick="saveWeekly()">Save</button><button class="btn full upper" onclick="resetWeekly()" style="font-size:11px">Reset to defaults</button></div>`;
 }
 
 
@@ -2052,6 +2050,7 @@ function installKeyboardFix(){
 function boot(){
   document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => go(b.dataset.tab)));
   installKeyboardFix();
+  migrateWeeklyToObjectFormat();
   render();
   setBreath("box");
   const h = new Date().getHours();
@@ -2060,6 +2059,7 @@ function boot(){
     navigator.serviceWorker.register("./sw.js").catch(()=>{});
   }
 }
+
 if(document.readyState === "loading"){
   document.addEventListener("DOMContentLoaded", boot);
 } else {
@@ -2068,3 +2068,4 @@ if(document.readyState === "loading"){
 </script>
 </body>
 </html>
+                                 

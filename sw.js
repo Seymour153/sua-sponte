@@ -1,7 +1,7 @@
 /* Sua Sponte — offline-first service worker
    Cache the app shell so the app works with no network.
 */
-const CACHE = "suasponte-v15";
+const CACHE = "suasponte-v16";
 const ASSETS = [
   "./",
   "./index.html",
