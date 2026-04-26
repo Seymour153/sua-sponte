@@ -440,10 +440,12 @@
       <div id="readinessMap"></div>
     </div>
 
-    <div class="card">
-      <h2>Trends · the lifetime arc</h2>
-      <p class="sub" style="margin-top:-4px;margin-bottom:10px">30-day window · 90-day window · all-time. Lifetime data; the longer the arc, the truer the read.</p>
-      <div id="trendsBox"></div>
+    <div class="card collapsible collapsed">
+      <h2 onclick="toggleCard(this.parentElement)">Trends · the lifetime arc</h2>
+      <div class="collapsible-body">
+        <p class="sub" style="margin-top:6px;margin-bottom:10px">30-day window · 90-day window · all-time. The longer the arc, the truer the read.</p>
+        <div id="trendsBox"></div>
+      </div>
     </div>
 
     <div class="card">
@@ -1643,6 +1645,12 @@ function saveWeekly(){
   });
   save(); render(); toast("Weekly template saved");
 }
+function resetWeekly(){
+  if(!confirm("Reset weekly template to the comeback defaults? Your saved entries for each day will be replaced.")) return;
+  // Pull defaults fresh from DEFAULTS
+  state.weekly = JSON.parse(JSON.stringify(DEFAULTS.weekly));
+  save(); render(); toast("Weekly template reset to defaults");
+}
 function markSessionDone(){
   const t = today();
   t.sessionDone = !t.sessionDone;
@@ -1695,7 +1703,10 @@ function renderWeeklyTemplate(){
         <label class="lbl">${d.short}</label>
         <input id="wk_${d.k}" value="${esc(w[d.k]||"")}" placeholder="${placeholders[d.k]}">
       </div>`).join("")}
-    <button class="btn primary full upper" onclick="saveWeekly()">Save weekly template</button>
+    <div class="grid2" style="gap:8px">
+      <button class="btn primary full upper" onclick="saveWeekly()">Save</button>
+      <button class="btn full upper" onclick="resetWeekly()" style="font-size:11px">Reset to defaults</button>
+    </div>
   `;
 }
 
