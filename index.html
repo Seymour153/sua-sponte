@@ -316,6 +316,15 @@
       <div id="todaySessionBrief"></div>
     </div>
 
+    <div class="card collapsible collapsed" style="background:var(--bg-2)">
+      <h2 onclick="toggleCard(this.parentElement)">How this app pairs with APEX</h2>
+      <div class="collapsible-body">
+        <p class="sub" style="margin-top:6px;line-height:1.65;font-size:13px"><b style="color:var(--tan)">Sua Sponte</b> = the engine layer. RASP-specific events (push-ups in 2-min, sit-ups, pull-ups, 2-mi run, 5-mi run, 12-mi ruck), AAR, mind work, daily mission, creed.</p>
+        <p class="sub" style="margin-top:8px;line-height:1.65;font-size:13px"><b style="color:var(--tan)">APEX</b> = the mass layer. Hypertrophy lifts (bench, deadlift, OHP, rows, weighted pull-ups), macros, water, body weight, AI nutrition coach.</p>
+        <p class="sub" style="margin-top:8px;line-height:1.65;font-size:13px;border-left:2px solid var(--line);padding-left:10px">One rule, no exceptions: <b>do not double-log workouts.</b> Strength sessions live in APEX. The six selection events live in Sua Sponte. Cross-training (bike, swim) goes in the cross-training log on this app's PT tab.</p>
+      </div>
+    </div>
+
     <div class="card">
       <h2>What your data says</h2>
       <p class="sub" style="margin-top:-4px;margin-bottom:8px">Reads of your last 7\u201360 days. The app is finally listening; this is what it heard.</p>
@@ -894,13 +903,13 @@ const DEFAULTS = {
   startDate: dk(),
   phase: "base",
   weekly: {
-    mon: "Easy 2-3 mi run conversational + push/pull strength",
+    mon: "PUSH day in APEX (bench/OHP/triceps) + easy 2-3 mi run",
     tue: "Bike 45-60 min easy + core",
-    wed: "Bike intervals OR run 3 mi tempo (alternate weeks)",
-    thu: "Strength full body + chin-up volume",
-    fri: "Run 3-4 mi steady + mobility",
-    sat: "Long bike 60-90 min OR short ruck 4-5 mi at 30 lb",
-    sun: "Rest / walk / read"
+    wed: "Run intervals OR 3 mi tempo (alternate weeks)",
+    thu: "PULL day in APEX (rows/pull-ups/biceps) + chin-up max set",
+    fri: "Steady 3-4 mi run + mobility",
+    sat: "Ruck 4-5 mi at 30 lb OR long bike 60-90 min",
+    sun: "Rest"
   },
   days: {},
   build: [
@@ -1739,8 +1748,7 @@ function renderPhase(){
       ${cur.emphasis ? `<div style="font-size:13px;font-weight:600;color:var(--tan);margin-bottom:6px">Emphasis: <span style="color:var(--ink);font-weight:500">${cur.emphasis}</span></div>` : ""}
       ${weekly ? `<div class="sub" style="font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-dim);margin-top:10px;margin-bottom:6px">What this looks like in practice (weekly)</div>
         <ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.6;color:var(--ink-dim)">${weekly}</ul>` : ""}
-      ${cur.pitfalls ? `<div style="margin-top:10px;padding:8px 10px;background:rgba(196,168,107,.06);border-left:2px solid var(--tan);font-size:12px;line-height:1.55"><b style="color:var(--tan);font-size:10px;letter-spacing:.15em;text-transform:uppercase">Pitfalls</b><br>${cur.pitfalls}</div>` : ""}
-      <p class="sub" style="margin-top:10px;font-size:11px;line-height:1.5;font-style:italic">Scaffolding, not gospel. A qualified coach who has seen you move and knows your history will outperform any generic plan. (Bompa &amp; Haff 2018; MTI / Rob Shaul; ACSM)</p>`;
+      ${cur.pitfalls ? `<div style="margin-top:10px;padding:8px 10px;background:rgba(196,168,107,.06);border-left:2px solid var(--tan);font-size:12px;line-height:1.55"><b style="color:var(--tan);font-size:10px;letter-spacing:.15em;text-transform:uppercase">Pitfalls</b><br>${cur.pitfalls}</div>` : ""}`;
   }
   const chips = document.getElementById("phaseChips");
   if(chips){
